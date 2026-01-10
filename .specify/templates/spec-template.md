@@ -84,16 +84,24 @@
 
 ### Functional Requirements
 
-- **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
-- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]  
-- **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
-- **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
-- **FR-005**: System MUST [behavior, e.g., "log all security events"]
+- **FR-001**: System MUST follow strict Spec-Driven Development (Specify → Plan → Tasks → Implement)
+- **FR-002**: System MUST use Next.js 16+ with App Router for the frontend
+- **FR-003**: System MUST use FastAPI for the backend service
+- **FR-004**: System MUST use SQLModel ORM for database operations
+- **FR-005**: System MUST use Neon Serverless PostgreSQL as the database
+- **FR-006**: System MUST use Better Auth for JWT-based authentication
+- **FR-007**: System MUST implement REST API only (no GraphQL, gRPC, or other protocols)
+- **FR-008**: System MUST require JWT authentication for all API endpoints
+- **FR-009**: System MUST extract user ID from JWT token for data isolation
+- **FR-010**: System MUST ensure users can only access their own tasks/data
+- **FR-011**: System MUST share JWT secret via environment variables between frontend and backend
+- **FR-012**: System MUST separate backend and frontend as independent services
+- **FR-013**: System MUST ensure mandatory authentication for all features
+- **FR-014**: System MUST isolate user data access to prevent cross-user visibility
 
 *Example of marking unclear requirements:*
 
-- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+- **FR-015**: System MUST [NEEDS CLARIFICATION: specific business logic requirement not specified]
 
 ### Key Entities *(include if feature involves data)*
 

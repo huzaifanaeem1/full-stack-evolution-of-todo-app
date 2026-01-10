@@ -1,55 +1,99 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!-- SYNC IMPACT REPORT:
+Version change: N/A -> 1.0.0
+Modified principles: None (new constitution)
+Added sections: All sections (new constitution)
+Removed sections: None
+Templates requiring updates:
+- .specify/templates/plan-template.md: ✅ updated
+- .specify/templates/spec-template.md: ✅ updated
+- .specify/templates/tasks-template.md: ✅ updated
+- .specify/templates/commands/*.md: ✅ reviewed
+Follow-up TODOs: None
+-->
+
+# Todo Full-Stack Web Application Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### Strict Spec-Driven Development (NON-NEGOTIABLE)
+Every feature follows the Specify → Plan → Tasks → Implement sequence; Specifications must be complete before planning begins; Plans must be approved before implementation starts; No implementation without corresponding tasks.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### No Manual Coding by User (NON-NEGOTIABLE)
+All code must be generated through automated processes; Users interact only through specifications, plans, and task definitions; Manual code changes are prohibited unless through automated generation tools.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### Phase Separation: CLI vs Web Application
+Phase I (CLI) and Phase II (Full-Stack Web App) are completely separate implementations; Codebases, repositories, and architectures must remain independent; No code sharing between phases unless through well-defined libraries.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### Separate Backend and Frontend Services
+Backend and frontend must be developed as separate deployable services; Clear API contracts define communication between services; Each service has independent scaling and deployment capabilities.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### Mandatory Authentication
+Every endpoint and feature must require user authentication; No anonymous access allowed except health/status endpoints; Authentication must be implemented using Better Auth (JWT-based).
 
-### [PRINCIPLE_6_NAME]
+### User-Isolated Data Access
+Users can only access their own data; No cross-user data visibility or manipulation allowed; All database queries must include user-id filters for security.
 
+## Technology Stack Requirements
 
-[PRINCIPLE__DESCRIPTION]
+### Frontend: Next.js 16+ (App Router)
+Frontend must use Next.js version 16 or higher with App Router architecture; Strict adherence to App Router patterns and conventions; Client-side and server-side rendering capabilities leveraged appropriately.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### Backend: FastAPI (Python)
+Backend services must be built using FastAPI framework; Python type hints utilized for automatic API documentation; Pydantic models for request/response validation.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### ORM: SQLModel
+Database operations must use SQLModel ORM; Models must inherit from SQLModel's base classes; Proper relationship definitions and foreign key constraints enforced.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+### Database: Neon Serverless PostgreSQL
+Database layer must use Neon Serverless PostgreSQL; Connection pooling and optimization for serverless environments; Proper schema migrations and versioning.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### Authentication: Better Auth (JWT-based)
+Authentication system must use Better Auth library; JWT tokens for session management; Consistent JWT secret shared between frontend and backend via environment variables.
+
+### API: REST Only
+API endpoints must follow RESTful conventions; No GraphQL, gRPC, or other protocols allowed; Standard HTTP methods and status codes.
+
+## Security Requirements
+
+### JWT Token Verification
+All API endpoints must verify JWT tokens before processing requests; Token verification must include signature validation and expiration checks; Proper error handling for invalid/expired tokens.
+
+### User ID Extraction from Token
+User ID must be consistently extracted from JWT payload; All user-specific operations must use the extracted user ID; No alternative user identification mechanisms.
+
+### Task Isolation by User
+Users can only access, modify, or delete their own tasks; Database queries must include user_id filters; API endpoints must validate user ownership before operations.
+
+### Environment Variable Security
+JWT secret must be shared via environment variables only; No hardcoded secrets in source code; Proper environment variable validation and error handling.
+
+## Non-Negotiable Constraints
+
+### No AI Features in Phase II
+No artificial intelligence capabilities in Phase II implementation; AI features reserved for future phases only; Current scope limited to core todo functionality.
+
+### No UI Overengineering
+Simple, functional UI design prioritized over complex interfaces; Minimal styling and components; Focus on core functionality over visual enhancements.
+
+### Scope Limitation
+Implementation restricted to requirements specified in the constitution; No additional features beyond specified requirements; Feature creep strictly prohibited.
+
+### Consistent JWT Secret Sharing
+Same JWT secret must be used across frontend and backend; Secure transmission and storage of the secret; Proper environment configuration for both services.
+
+## Development Workflow
+
+### Test-First Approach
+Tests must be written before implementation code; Unit, integration, and end-to-end tests required; Test coverage metrics maintained and enforced.
+
+### Continuous Integration
+Automated testing required for all code changes; Build and deployment pipelines must pass all tests; Code quality gates enforced through CI/CD.
+
+### Code Review Standards
+All changes must undergo peer review; Security and architecture compliance verified; Documentation updates included in all pull requests.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+All development must comply with this constitution; Amendments require formal approval process; Code reviews must verify constitution compliance; Deviations require explicit exception approval.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-01-09 | **Last Amended**: 2026-01-09

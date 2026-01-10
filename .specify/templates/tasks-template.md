@@ -7,6 +7,7 @@ description: "Task list template for feature implementation"
 
 **Input**: Design documents from `/specs/[###-feature-name]/`
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
+**Constitution Compliance**: All tasks must comply with constitution requirements
 
 **Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
 
@@ -62,12 +63,14 @@ description: "Task list template for feature implementation"
 
 Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
-- [ ] T007 Create base models/entities that all stories depend on
-- [ ] T008 Configure error handling and logging infrastructure
-- [ ] T009 Setup environment configuration management
+- [ ] T004 Setup database schema and migrations framework with Neon Serverless PostgreSQL
+- [ ] T005 [P] Implement authentication framework using Better Auth (JWT-based)
+- [ ] T006 [P] Setup API routing and middleware structure for FastAPI
+- [ ] T007 Create base models/entities that all stories depend on using SQLModel
+- [ ] T008 Configure JWT token verification and user ID extraction middleware
+- [ ] T009 Setup environment configuration management for JWT secret sharing
+- [ ] T010 Implement user data isolation mechanism for task access control
+- [ ] T011 Configure REST API structure following constitution requirements
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 

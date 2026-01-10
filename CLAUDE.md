@@ -208,3 +208,12 @@ Wait for consent; never auto-create ADRs. Group related decisions (stacks, authe
 
 ## Code Standards
 See `.specify/memory/constitution.md` for code quality, testing, performance, security, and architecture principles.
+
+## Active Technologies
+- Python 3.11+ for backend (FastAPI), JavaScript/TypeScript for frontend (Next.js 16+) + FastAPI, SQLModel, Neon PostgreSQL driver, Better Auth, Next.js App Router (001-todo-web-app)
+- Neon Serverless PostgreSQL database with SQLModel ORM (001-todo-web-app)
+- JavaScript/TypeScript for frontend (Next.js 16+), Python 3.11+ for backend (FastAPI) + Next.js App Router, React, FastAPI, SQLModel, Neon PostgreSQL driver, Better Auth (001-frontend-integration)
+- Python 3.11+ for backend (FastAPI), TypeScript 5.0+ for frontend (Next.js 16+) + FastAPI, SQLModel, Neon PostgreSQL driver, Better Auth, Next.js App Router (001-api-hardening)
+
+## Recent Changes
+- 001-todo-web-app: Added Python 3.11+ for backend (FastAPI), JavaScript/TypeScript for frontend (Next.js 16+) + FastAPI, SQLModel, Neon PostgreSQL driver, Better Auth, Next.js App Router

@@ -31,7 +31,31 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+### Spec-Driven Development Compliance
+- [ ] Specification document exists and is complete in `/specs/[###-feature-name]/spec.md`
+- [ ] Plan document will be created based on spec requirements
+- [ ] Tasks will be generated from plan before implementation begins
+
+### Technology Stack Verification
+- [ ] Frontend will use Next.js 16+ with App Router
+- [ ] Backend will use FastAPI framework
+- [ ] SQLModel ORM will be used for database operations
+- [ ] Neon Serverless PostgreSQL will be the database
+- [ ] Better Auth will be used for JWT-based authentication
+- [ ] REST API design will be followed (no GraphQL/other protocols)
+
+### Security Requirements Check
+- [ ] All API endpoints will require JWT token verification
+- [ ] User ID will be extracted from JWT payload for data isolation
+- [ ] Users will only access their own data/tasks
+- [ ] JWT secret will be shared via environment variables only
+- [ ] No hardcoded secrets in source code
+
+### Architecture Requirements
+- [ ] Backend and frontend will be separate deployable services
+- [ ] Authentication will be mandatory for all features
+- [ ] Data access will be user-isolated
+- [ ] Phase I (CLI) and Phase II (Web App) remain separate
 
 ## Project Structure
 
