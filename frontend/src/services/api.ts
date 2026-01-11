@@ -19,7 +19,8 @@ apiClient.interceptors.request.use(
     if (!isAuthEndpoint && isAuthenticated()) {
       const token = getAuthToken();
       if (token) {
-        config.headers!.Authorization = `Bearer ${token}`;
+        config.headers = config.headers || {};
+        config.headers.Authorization = `Bearer ${token}`;
       }
     }
 
