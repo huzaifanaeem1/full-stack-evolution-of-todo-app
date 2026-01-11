@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Task } from '../../../types/index';
 import { TaskItem } from '../../../components/TaskItem';
-import apiClient from '../../../services/api';
-import { isAuthenticated } from '../../../services/auth';
+import { taskAPI } from '../../../services/api';
+import { isAuthenticated, getUserId } from '../../../services/auth';
 
 export default function TaskDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -27,9 +27,13 @@ export default function TaskDetailPage() {
   const fetchTask = async () => {
     try {
       setLoading(true);
-      const userId = localStorage.getItem('user_id');
-      const response = await apiClient.get(`/api/${userId}/tasks/${id}`);
-      setTask(response.data);
+      const userId = getUserId();
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      const task = await taskAPI.getTask(userId, id);
+      setTask(task);
       setError(null);
     } catch (err: any) {
       if (err.response?.status === 401) {

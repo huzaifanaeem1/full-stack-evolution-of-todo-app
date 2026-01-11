@@ -6,8 +6,8 @@ import Link from 'next/link';
 import { Task } from '../../types/index';
 import { TaskList } from '../../components/TaskList';
 import { TaskForm } from '../../components/TaskForm';
-import apiClient from '../../services/api';
-import { isAuthenticated } from '../../services/auth';
+import { taskAPI } from '../../services/api';
+import { isAuthenticated, getUserId } from '../../services/auth';
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -28,8 +28,12 @@ export default function TasksPage() {
   const fetchTasks = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get(`/api/${localStorage.getItem('user_id')}/tasks`);
-      setTasks(response.data);
+      const userId = getUserId();
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+      const tasks = await taskAPI.getTasks(userId);
+      setTasks(tasks);
       setError(null);
     } catch (err: any) {
       if (err.response?.status === 401) {

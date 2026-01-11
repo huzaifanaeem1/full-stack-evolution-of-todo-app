@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { Task } from '../types';
-import apiClient from '../services/api';
+import { taskAPI } from '../services/api';
+import { getUserId } from '../services/auth';
 
 interface TaskItemProps {
   task: Task;
@@ -20,13 +21,17 @@ export const TaskItem = ({ task, onTaskUpdated, onTaskDeleted }: TaskItemProps) 
   const handleToggleComplete = async () => {
     setLoading(true);
     try {
-      const userId = localStorage.getItem('user_id');
-      const response = await apiClient.patch(`/api/${userId}/tasks/${task.id}/complete`, {
+      const userId = getUserId();
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      const updatedTask = await taskAPI.patchTaskCompletion(userId, task.id, {
         is_completed: !task.is_completed
       });
 
       // Optimistic update - immediately update UI with toggled status
-      onTaskUpdated({ ...task, is_completed: !task.is_completed });
+      onTaskUpdated(updatedTask);
     } catch (err: any) {
       setError(err.response?.data?.detail || err.message || 'Failed to update task');
     } finally {
@@ -46,15 +51,19 @@ export const TaskItem = ({ task, onTaskUpdated, onTaskDeleted }: TaskItemProps) 
     setError(null);
 
     try {
-      const userId = localStorage.getItem('user_id');
-      const response = await apiClient.put(`/api/${userId}/tasks/${task.id}`, {
+      const userId = getUserId();
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      const updatedTask = await taskAPI.updateTask(userId, task.id, {
         title: title.trim(),
         description: description.trim(),
         is_completed: task.is_completed
       });
 
       // Optimistic update - immediately update UI with new task
-      onTaskUpdated(response.data);
+      onTaskUpdated(updatedTask);
       setIsEditing(false);
     } catch (err: any) {
       setError(err.response?.data?.detail || err.message || 'Failed to update task');
@@ -70,8 +79,12 @@ export const TaskItem = ({ task, onTaskUpdated, onTaskDeleted }: TaskItemProps) 
 
     setLoading(true);
     try {
-      const userId = localStorage.getItem('user_id');
-      await apiClient.delete(`/api/${userId}/tasks/${task.id}`);
+      const userId = getUserId();
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      await taskAPI.deleteTask(userId, task.id);
 
       // Optimistic update - immediately remove task from UI
       onTaskDeleted(task.id);

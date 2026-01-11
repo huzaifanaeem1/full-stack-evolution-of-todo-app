@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { Task } from '../types';
-import apiClient from '../services/api';
+import { taskAPI } from '../services/api';
+import { getUserId } from '../services/auth';
 
 interface TaskItemProps {
   task: Task;
@@ -20,13 +21,17 @@ export const TaskItem = ({ task, onTaskUpdated, onTaskDeleted }: TaskItemProps) 
   const handleToggleComplete = async () => {
     setLoading(true);
     try {
-      const userId = localStorage.getItem('user_id');
-      const response = await apiClient.patch(`/api/${userId}/tasks/${task.id}/complete`, {
+      const userId = getUserId();
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      const updatedTask = await taskAPI.patchTaskCompletion(userId, task.id, {
         is_completed: !task.is_completed
       });
 
       // Optimistic update - immediately update UI with toggled status
-      onTaskUpdated({ ...task, is_completed: !task.is_completed });
+      onTaskUpdated(updatedTask);
     } catch (err: any) {
       setError(err.response?.data?.detail || err.message || 'Failed to update task');
     } finally {
@@ -46,15 +51,19 @@ export const TaskItem = ({ task, onTaskUpdated, onTaskDeleted }: TaskItemProps) 
     setError(null);
 
     try {
-      const userId = localStorage.getItem('user_id');
-      const response = await apiClient.put(`/api/${userId}/tasks/${task.id}`, {
+      const userId = getUserId();
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      const updatedTask = await taskAPI.updateTask(userId, task.id, {
         title: title.trim(),
         description: description.trim(),
         is_completed: task.is_completed
       });
 
       // Optimistic update - immediately update UI with new task
-      onTaskUpdated(response.data);
+      onTaskUpdated(updatedTask);
       setIsEditing(false);
     } catch (err: any) {
       setError(err.response?.data?.detail || err.message || 'Failed to update task');
@@ -70,8 +79,12 @@ export const TaskItem = ({ task, onTaskUpdated, onTaskDeleted }: TaskItemProps) 
 
     setLoading(true);
     try {
-      const userId = localStorage.getItem('user_id');
-      await apiClient.delete(`/api/${userId}/tasks/${task.id}`);
+      const userId = getUserId();
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      await taskAPI.deleteTask(userId, task.id);
 
       // Optimistic update - immediately remove task from UI
       onTaskDeleted(task.id);
@@ -88,33 +101,43 @@ export const TaskItem = ({ task, onTaskUpdated, onTaskDeleted }: TaskItemProps) 
 
   if (isEditing) {
     return (
-      <div className="border border-gray-200 rounded-lg p-4 mb-3 bg-white">
+      <div className="border border-purple-500/30 rounded-xl p-5 mb-4 bg-gradient-to-br from-purple-900/10 to-black/30 backdrop-blur-sm">
         <form onSubmit={handleUpdate}>
-          <div className="mb-2">
+          <div className="mb-3">
+            <label htmlFor={`title-${task.id}`} className="block text-sm font-medium text-gray-300 mb-1">
+              Task Title
+            </label>
             <input
+              id={`title-${task.id}`}
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-black/30 border border-purple-500/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
               disabled={loading}
             />
           </div>
 
-          <div className="mb-3">
+          <div className="mb-4">
+            <label htmlFor={`desc-${task.id}`} className="block text-sm font-medium text-gray-300 mb-1">
+              Description
+            </label>
             <textarea
+              id={`desc-${task.id}`}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={2}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={3}
+              className="w-full px-4 py-2 bg-black/30 border border-purple-500/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
               disabled={loading}
             />
           </div>
 
           {error && (
-            <div className="text-red-500 text-sm mb-2">{error}</div>
+            <div className="bg-red-900/30 border border-red-500/30 text-red-400 px-3 py-2 rounded-lg text-sm mb-3">
+              {error}
+            </div>
           )}
 
-          <div className="flex justify-end space-x-2">
+          <div className="flex justify-end space-x-3">
             <button
               type="button"
               onClick={() => {
@@ -123,20 +146,20 @@ export const TaskItem = ({ task, onTaskUpdated, onTaskDeleted }: TaskItemProps) 
                 setDescription(task.description || '');
               }}
               disabled={loading}
-              className="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50"
+              className="px-4 py-2 bg-gray-600 text-gray-200 rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-all duration-200"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className={`px-3 py-1 rounded-md ${
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                 loading
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  ? 'bg-gray-600 cursor-not-allowed text-gray-400'
+                  : 'bg-gradient-to-r from-purple-600 to-yellow-600 text-white hover:from-purple-700 hover:to-yellow-700 shadow-lg hover:shadow-purple-500/25'
               }`}
             >
-              {loading ? 'Saving...' : 'Save'}
+              {loading ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </form>
@@ -145,31 +168,61 @@ export const TaskItem = ({ task, onTaskUpdated, onTaskDeleted }: TaskItemProps) 
   }
 
   return (
-    <div className={`border border-gray-200 rounded-lg p-4 mb-3 ${task.is_completed ? 'bg-green-50' : 'bg-white'}`}>
+    <div className={`border border-purple-500/20 rounded-xl p-5 mb-4 transition-all duration-200 ${
+      task.is_completed
+        ? 'bg-gradient-to-r from-green-900/20 to-emerald-900/20 border-green-500/30'
+        : 'bg-gradient-to-br from-purple-900/5 to-black/20 backdrop-blur-sm'
+    }`}>
       <div className="flex items-start">
-        <input
-          type="checkbox"
-          checked={task.is_completed}
-          onChange={handleToggleComplete}
-          disabled={loading}
-          className="mt-1 mr-3 h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
-        />
+        <div className="flex items-center h-5">
+          <input
+            type="checkbox"
+            checked={task.is_completed}
+            onChange={handleToggleComplete}
+            disabled={loading}
+            className="h-5 w-5 text-purple-600 rounded focus:ring-purple-500 bg-black/30 border-purple-500/30"
+          />
+        </div>
 
-        <div className="flex-1 min-w-0">
-          <h3 className={`text-lg font-medium ${task.is_completed ? 'line-through text-gray-500' : 'text-gray-800'}`}>
+        <div className="flex-1 min-w-0 ml-4">
+          <h3 className={`text-lg font-semibold ${
+            task.is_completed
+              ? 'line-through text-gray-400'
+              : 'text-white'
+          }`}>
             {task.title}
           </h3>
 
           {task.description && (
-            <p className={`mt-1 text-gray-600 ${task.is_completed ? 'line-through' : ''}`}>
+            <p className={`mt-2 text-gray-400 ${
+              task.is_completed ? 'line-through' : ''
+            }`}>
               {task.description}
             </p>
           )}
 
-          <div className="mt-2 text-sm text-gray-500">
-            <span>Created: {formatDate(task.created_at)}</span>
+          <div className="mt-3 flex flex-wrap gap-3 text-xs text-gray-500">
+            <span className="flex items-center">
+              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Created: {formatDate(task.created_at)}
+            </span>
             {task.updated_at !== task.created_at && (
-              <span className="ml-3">Updated: {formatDate(task.updated_at)}</span>
+              <span className="flex items-center">
+                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Updated: {formatDate(task.updated_at)}
+              </span>
+            )}
+            {task.is_completed && (
+              <span className="flex items-center text-green-400">
+                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Completed
+              </span>
             )}
           </div>
         </div>
@@ -178,16 +231,22 @@ export const TaskItem = ({ task, onTaskUpdated, onTaskDeleted }: TaskItemProps) 
           <button
             onClick={() => setIsEditing(true)}
             disabled={loading}
-            className="text-blue-600 hover:text-blue-800 disabled:opacity-50"
+            className="p-2 text-gray-400 hover:text-yellow-400 disabled:opacity-50 transition-colors duration-200 rounded-lg hover:bg-black/20"
+            title="Edit task"
           >
-            Edit
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
           </button>
           <button
             onClick={handleDelete}
             disabled={loading}
-            className="text-red-600 hover:text-red-800 disabled:opacity-50"
+            className="p-2 text-gray-400 hover:text-red-400 disabled:opacity-50 transition-colors duration-200 rounded-lg hover:bg-black/20"
+            title="Delete task"
           >
-            Delete
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
           </button>
         </div>
       </div>

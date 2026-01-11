@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { Task } from '../types';
-import apiClient from '../services/api';
+import { taskAPI } from '../services/api';
+import { getUserId } from '../services/auth';
 
 interface TaskFormProps {
   onTaskCreated: (task: Task) => void;
@@ -26,14 +27,17 @@ export const TaskForm = ({ onTaskCreated }: TaskFormProps) => {
     setError(null);
 
     try {
-      const userId = localStorage.getItem('user_id');
-      const response = await apiClient.post(`/api/${userId}/tasks`, {
+      const userId = getUserId();
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      const newTask = await taskAPI.createTask(userId, {
         title: title.trim(),
         description: description.trim(),
       });
 
       // Optimistic update - immediately update UI with new task
-      const newTask: Task = response.data;
       onTaskCreated(newTask);
 
       // Reset form
