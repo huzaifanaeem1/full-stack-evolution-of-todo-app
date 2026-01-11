@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { Task, TaskCreate, TaskUpdate, TaskPatch, User, UserCreate, UserLogin } from '../types';
 import { getAuthToken, isAuthenticated } from './auth';
 
@@ -12,7 +12,7 @@ const apiClient = axios.create({
 
 // Request interceptor to attach JWT token to all requests (except auth endpoints)
 apiClient.interceptors.request.use(
-  (config: AxiosRequestConfig) => {
+  (config: InternalAxiosRequestConfig) => {
     // Don't attach token to auth endpoints (login, register)
     const isAuthEndpoint = config.url?.includes('/auth');
 
