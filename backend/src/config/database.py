@@ -10,6 +10,14 @@ load_dotenv()
 # Database URL from environment variable
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://localhost:5432/todo_app")
 
+# Ensure async driver is used for PostgreSQL connections
+if DATABASE_URL.startswith("postgresql://") and not DATABASE_URL.startswith("postgresql+asyncpg://"):
+    # Replace postgresql:// with postgresql+asyncpg:// to ensure async driver
+    DATABASE_URL = "postgresql+asyncpg://" + DATABASE_URL[12:]  # 12 is len("postgresql://")
+elif DATABASE_URL.startswith("postgres://"):  # Some services use postgres:// instead of postgresql://
+    # Replace postgres:// with postgresql+asyncpg:// to ensure async driver
+    DATABASE_URL = "postgresql+asyncpg://" + DATABASE_URL[11:]  # 11 is len("postgres://")
+
 # Create async engine for PostgreSQL
 async_engine = create_async_engine(DATABASE_URL)
 
