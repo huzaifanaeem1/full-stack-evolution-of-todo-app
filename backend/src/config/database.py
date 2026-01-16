@@ -18,24 +18,25 @@ elif DATABASE_URL.startswith("postgres://"):  # Some services use postgres:// in
     # Replace postgres:// with postgresql+asyncpg:// to ensure async driver
     DATABASE_URL = "postgresql+asyncpg://" + DATABASE_URL[11:]  # 11 is len("postgres://")
 
-# For asyncpg, some query parameters like sslmode need to be handled differently
-# Remove problematic query parameters that asyncpg doesn't support directly
-if DATABASE_URL.startswith("postgresql+asyncpg://") and "?" in DATABASE_URL:
-    base_url, query_params = DATABASE_URL.split("?", 1)
-    # Parse query parameters and keep only those that are compatible with asyncpg
-    params = {}
-    for param in query_params.split("&"):
-        if "=" in param:
-            key, value = param.split("=", 1)
-            # asyncpg handles SSL differently, so we'll remove sslmode and channel_binding
-            # since they're not expected as direct connect() arguments
-            if key not in ["sslmode", "channel_binding"]:
-                params[key] = value
+# Handle asyncpg-specific URL parameters that cause issues
+# Extract problematic query parameters that SQLAlchemy passes to asyncpg as kwargs
+if "?" in DATABASE_URL and DATABASE_URL.startswith("postgresql+asyncpg"):
+    base_url, query_string = DATABASE_URL.split("?", 1)
+    # Split query parameters
+    query_params = query_string.split("&")
 
-    # Reconstruct URL without problematic parameters
-    if params:
-        new_query = "&".join([f"{k}={v}" for k, v in params.items()])
-        DATABASE_URL = f"{base_url}?{new_query}"
+    # Filter out parameters that cause issues with asyncpg
+    filtered_params = []
+    for param in query_params:
+        if "=" in param:
+            key = param.split("=")[0]
+            # These parameters cause issues when passed directly to asyncpg
+            if key not in ["sslmode", "channel_binding"]:
+                filtered_params.append(param)
+
+    # Reconstruct the URL with filtered parameters
+    if filtered_params:
+        DATABASE_URL = f"{base_url}?{'&'.join(filtered_params)}"
     else:
         DATABASE_URL = base_url
 
