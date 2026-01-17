@@ -27,7 +27,7 @@ if "?" in DATABASE_URL and DATABASE_URL.startswith("postgresql+asyncpg"):
     query_params = query_string.split("&")
 
     # Parameters that cause TypeError when passed directly to asyncpg connect function
-    params_to_remove = ["sslmode", "channel_binding"]
+    params_to_remove = ["channel_binding"]  # Only remove channel_binding, keep sslmode for SSL negotiation
 
     filtered_params = []
     for param in query_params:
