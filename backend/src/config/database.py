@@ -46,11 +46,24 @@ if "?" in DATABASE_URL and DATABASE_URL.startswith("postgresql+asyncpg"):
 
 # Create async engine for PostgreSQL with proper connection settings for Neon
 # Enable pool_pre_ping to handle connection issues with serverless databases like Neon
-async_engine = create_async_engine(
-    DATABASE_URL,
-    pool_pre_ping=True,  # Verify connections before use (helpful for serverless DBs)
-    pool_recycle=300,    # Recycle connections every 5 minutes
-)
+if DATABASE_URL.startswith("postgresql+asyncpg://"):
+    async_engine = create_async_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,  # Verify connections before use (helpful for serverless DBs)
+        pool_recycle=300,    # Recycle connections every 5 minutes
+        # Additional settings for Neon PostgreSQL compatibility
+        connect_args={
+            "server_settings": {
+                "application_name": "todo-app",
+            }
+        }
+    )
+else:
+    async_engine = create_async_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,  # Verify connections before use (helpful for serverless DBs)
+        pool_recycle=300,    # Recycle connections every 5 minutes
+    )
 
 # Create async sessionmaker
 async_session = async_sessionmaker(async_engine, class_=AsyncSession, expire_on_commit=False)
