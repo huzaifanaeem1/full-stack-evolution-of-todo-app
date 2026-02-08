@@ -47,11 +47,11 @@ Phase 6 (Polish & Documentation)
 
 **Tasks**:
 
-- [ ] T001 Create deployment directory structure (docker/, helm/)
-- [ ] T002 Create .dockerignore for frontend in docker/frontend/.dockerignore
-- [ ] T003 Create .dockerignore for backend in docker/backend/.dockerignore
-- [ ] T004 Verify Minikube installation and start cluster
-- [ ] T005 Verify Docker, kubectl, and Helm installations
+- [x] T001 Create deployment directory structure (docker/, helm/)
+- [x] T002 Create .dockerignore for frontend in docker/frontend/.dockerignore
+- [x] T003 Create .dockerignore for backend in docker/backend/.dockerignore
+- [x] T004 Verify Minikube installation and start cluster
+- [x] T005 Verify Docker, kubectl, and Helm installations
 - [ ] T006 Document AI DevOps tools setup (Gordon, kubectl-ai, kagent) in docs/ai-devops-setup.md
 
 **Acceptance**: Directory structure exists, prerequisites verified, Minikube cluster running
@@ -64,20 +64,20 @@ Phase 6 (Polish & Documentation)
 
 ### Docker Image Tasks
 
-- [ ] T007 [P] Create frontend Dockerfile with multi-stage build in docker/frontend/Dockerfile
-- [ ] T008 [P] Create backend Dockerfile with multi-stage build in docker/backend/Dockerfile
-- [ ] T009 [P] Build frontend Docker image (todo-frontend:v1.0.0)
-- [ ] T010 [P] Build backend Docker image (todo-backend:v1.0.0)
-- [ ] T011 Load frontend image into Minikube
-- [ ] T012 Load backend image into Minikube
-- [ ] T013 Verify images available in Minikube registry
+- [x] T007 [P] Create frontend Dockerfile with multi-stage build in docker/frontend/Dockerfile
+- [x] T008 [P] Create backend Dockerfile with multi-stage build in docker/backend/Dockerfile
+- [x] T009 [P] Build frontend Docker image (todo-frontend:v1.0.0)
+- [x] T010 [P] Build backend Docker image (todo-backend:v1.0.0)
+- [x] T011 Load frontend image into Minikube
+- [x] T012 Load backend image into Minikube
+- [x] T013 Verify images available in Minikube registry
 
 ### Helm Chart Structure Tasks
 
-- [ ] T014 Create Helm chart directory structure in helm/todo-chatbot/
-- [ ] T015 Create Chart.yaml with metadata in helm/todo-chatbot/Chart.yaml
-- [ ] T016 Create values.yaml with default configuration in helm/todo-chatbot/values.yaml
-- [ ] T017 Create _helpers.tpl with template functions in helm/todo-chatbot/templates/_helpers.tpl
+- [x] T014 Create Helm chart directory structure in helm/todo-chatbot/
+- [x] T015 Create Chart.yaml with metadata in helm/todo-chatbot/Chart.yaml
+- [x] T016 Create values.yaml with default configuration in helm/todo-chatbot/values.yaml
+- [x] T017 Create _helpers.tpl with template functions in helm/todo-chatbot/templates/_helpers.tpl
 
 **Acceptance**: Docker images built and loaded, Helm chart structure created
 
@@ -91,21 +91,21 @@ Phase 6 (Polish & Documentation)
 
 ### Kubernetes Resource Templates
 
-- [ ] T018 [P] [US1] Create frontend Deployment template in helm/todo-chatbot/templates/frontend-deployment.yaml
-- [ ] T019 [P] [US1] Create backend Deployment template in helm/todo-chatbot/templates/backend-deployment.yaml
-- [ ] T020 [P] [US1] Create frontend Service template in helm/todo-chatbot/templates/frontend-service.yaml
-- [ ] T021 [P] [US1] Create backend Service template in helm/todo-chatbot/templates/backend-service.yaml
-- [ ] T022 [P] [US1] Create ConfigMap template in helm/todo-chatbot/templates/configmap.yaml
-- [ ] T023 [P] [US1] Create Secrets template in helm/todo-chatbot/templates/secrets.yaml
+- [x] T018 [P] [US1] Create frontend Deployment template in helm/todo-chatbot/templates/frontend-deployment.yaml
+- [x] T019 [P] [US1] Create backend Deployment template in helm/todo-chatbot/templates/backend-deployment.yaml
+- [x] T020 [P] [US1] Create frontend Service template in helm/todo-chatbot/templates/frontend-service.yaml
+- [x] T021 [P] [US1] Create backend Service template in helm/todo-chatbot/templates/backend-service.yaml
+- [x] T022 [P] [US1] Create ConfigMap template in helm/todo-chatbot/templates/configmap.yaml
+- [x] T023 [P] [US1] Create Secrets template in helm/todo-chatbot/templates/secrets.yaml
 
 ### Deployment Tasks
 
-- [ ] T024 [US1] Render Helm templates and validate syntax with `helm template`
-- [ ] T025 [US1] Lint Helm chart with `helm lint`
-- [ ] T026 [US1] Prepare base64-encoded secrets for DATABASE_URL and JWT_SECRET
-- [ ] T027 [US1] Install Helm chart with `helm install todo-chatbot`
-- [ ] T028 [US1] Wait for pods to reach Running state (kubectl wait)
-- [ ] T029 [US1] Verify all Kubernetes resources created (Deployments, Services, ConfigMaps, Secrets)
+- [x] T024 [US1] Render Helm templates and validate syntax with `helm template`
+- [x] T025 [US1] Lint Helm chart with `helm lint`
+- [x] T026 [US1] Prepare base64-encoded secrets for DATABASE_URL and JWT_SECRET
+- [x] T027 [US1] Install Helm chart with `helm install todo-chatbot`
+- [x] T028 [US1] Wait for pods to reach Running state (kubectl wait)
+- [x] T029 [US1] Verify all Kubernetes resources created (Deployments, Services, ConfigMaps, Secrets)
 
 **Story Acceptance**:
 - ✅ Helm install completes successfully
@@ -123,10 +123,10 @@ Phase 6 (Polish & Documentation)
 
 ### Service Validation Tasks
 
-- [ ] T030 [US2] Get frontend service URL with `minikube service todo-chatbot-frontend --url`
-- [ ] T031 [US2] Verify frontend accessible in browser
-- [ ] T032 [US2] Test backend health endpoint with port-forward
-- [ ] T033 [US2] Verify frontend can reach backend via Kubernetes DNS
+- [x] T030 [US2] Get frontend service URL with `minikube service todo-chatbot-frontend --url`
+- [x] T031 [US2] Verify frontend accessible in browser
+- [x] T032 [US2] Test backend health endpoint with port-forward
+- [x] T033 [US2] Verify frontend can reach backend via Kubernetes DNS
 - [ ] T034 [US2] Test end-to-end application functionality (login, create task, view tasks)
 
 **Story Acceptance**:
