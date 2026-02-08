@@ -1,8 +1,87 @@
-# Evolution of Todo: Phase II - Full-Stack Web Application
+# Evolution of Todo: Full-Stack Web Application
 
 ## Overview
 
 This repository contains the implementation of a multi-user todo web application with secure authentication, task management, and proper user data isolation. The application consists of a Next.js frontend with App Router and a FastAPI backend with JWT-based authentication.
+
+This project was built using **Spec-Driven Development (SDD)** methodology, progressing through multiple phases from specification to implementation.
+
+## Development Phases
+
+### Phase 2 - Part 1: Backend Foundation & Authentication (001-todo-web-app)
+**Objective**: Transform the CLI todo app into a modern multi-user web application with persistent storage.
+
+**What Was Built**:
+- ✅ FastAPI backend with REST API architecture
+- ✅ SQLModel ORM integration with Neon Serverless PostgreSQL
+- ✅ JWT-based authentication system using Better Auth
+- ✅ User registration and login functionality
+- ✅ Complete CRUD operations for tasks (Create, Read, Update, Delete)
+- ✅ Task completion toggle functionality
+- ✅ User data isolation - users can only access their own tasks
+- ✅ Database schema with User and Task models
+- ✅ Environment-based configuration management
+
+**Key Achievements**:
+- Implemented secure authentication flow with JWT tokens
+- Established proper user-task relationships in the database
+- Created RESTful API endpoints following best practices
+- Set up database migrations with Alembic
+- Configured Neon PostgreSQL for serverless deployment
+
+### Phase 2 - Part 2: Frontend Integration & UI (001-frontend-integration)
+**Objective**: Complete the frontend implementation and establish secure API integration between frontend and backend.
+
+**What Was Built**:
+- ✅ Next.js 16+ App Router implementation
+- ✅ Login page (`/login`) with authentication flow
+- ✅ Registration page (`/register`) for new users
+- ✅ Tasks dashboard (`/tasks`) for task management
+- ✅ Responsive UI design (mobile + desktop)
+- ✅ Real-time UI updates without page refresh
+- ✅ JWT token management and automatic attachment to API requests
+- ✅ Loading, error, and success state handling
+- ✅ Axios-based API client with interceptors
+- ✅ Visual distinction between completed and pending tasks
+
+**Key Achievements**:
+- Seamless frontend-backend communication with JWT authentication
+- Immediate UI feedback for all CRUD operations
+- Proper error handling and user feedback
+- Responsive design that works across devices
+- Secure token storage and management
+
+### Phase 2 - Part 3: Security Hardening & Validation (001-api-hardening)
+**Objective**: Harden the application security, validate API behavior, and ensure compliance with requirements.
+
+**What Was Built**:
+- ✅ Comprehensive JWT validation on ALL API endpoints
+- ✅ User ID verification - URL user_id must match JWT user_id
+- ✅ Proper HTTP status codes (200, 201, 401, 403, 404)
+- ✅ Cross-user access prevention with 403 Forbidden responses
+- ✅ Unauthorized request handling with 401 responses
+- ✅ Input validation and error handling
+- ✅ Security testing and validation
+- ✅ Documentation updates with security details
+
+**Key Achievements**:
+- 100% of API endpoints require valid JWT authentication
+- Zero cross-user data access - complete user isolation
+- Proper error responses with appropriate status codes
+- No hardcoded secrets - all configuration via environment variables
+- Comprehensive security validation and testing
+
+## Project Evolution Summary
+
+This project demonstrates a complete evolution from specification to production-ready application:
+
+1. **Specification Phase**: Detailed requirements and user stories defined
+2. **Planning Phase**: Architecture decisions and implementation strategy
+3. **Task Breakdown**: Granular, testable tasks created
+4. **Implementation Phase**: Systematic development following the plan
+5. **Validation Phase**: Security hardening and requirement verification
+
+The result is a secure, scalable, multi-user todo application with proper authentication, authorization, and data isolation.
 
 ## Features
 
