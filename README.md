@@ -71,6 +71,36 @@ This project was built using **Spec-Driven Development (SDD)** methodology, prog
 - No hardcoded secrets - all configuration via environment variables
 - Comprehensive security validation and testing
 
+### Phase 4: Kubernetes Deployment with Minikube (003-minikube-deployment)
+**Objective**: Deploy the Todo Chatbot application to a local Kubernetes cluster using Minikube with Helm for package management.
+
+**What Was Built**:
+- ✅ Docker containerization with multi-stage builds
+  - Frontend Dockerfile (Node 20 Alpine, optimized for Next.js 16+)
+  - Backend Dockerfile (Python 3.11 slim, optimized for FastAPI)
+- ✅ Helm chart structure (`helm/todo-chatbot/`)
+  - Chart.yaml with metadata
+  - values.yaml with configurable parameters
+  - Kubernetes resource templates (Deployments, Services, ConfigMaps, Secrets)
+- ✅ Kubernetes deployment configuration
+  - Frontend Deployment with health checks and resource limits
+  - Backend Deployment with health checks and resource limits
+  - NodePort Services for external access
+  - ConfigMap for environment configuration
+  - Secrets for sensitive data (DATABASE_URL, JWT_SECRET)
+- ✅ Service communication validation
+  - Frontend accessible via port-forward (HTTP 200)
+  - Backend health endpoint responding correctly
+  - Inter-service communication via Kubernetes DNS verified
+
+**Key Achievements**:
+- Successfully built and loaded Docker images into Minikube
+- Deployed application using Helm chart
+- All pods running and ready (1/1 Ready state)
+- Service-to-service communication working via Kubernetes DNS
+- No code modifications to Phase III application
+- Production-ready containerization with security best practices
+
 ## Project Evolution Summary
 
 This project demonstrates a complete evolution from specification to production-ready application:

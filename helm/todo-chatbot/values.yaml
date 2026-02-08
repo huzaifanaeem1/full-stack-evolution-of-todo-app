@@ -1,0 +1,65 @@
+# Default values for todo-chatbot
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Frontend configuration
+frontend:
+  replicaCount: 1
+  image:
+    repository: todo-frontend
+    tag: v1.0.0
+    pullPolicy: Never  # Use Never for local Minikube images
+  service:
+    type: NodePort
+    port: 3000
+    targetPort: 3000
+    nodePort: 30080
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  env:
+    NEXT_PUBLIC_API_URL: "http://localhost:30081"
+
+# Backend configuration
+backend:
+  replicaCount: 1
+  image:
+    repository: todo-backend
+    tag: v1.0.0
+    pullPolicy: Never  # Use Never for local Minikube images
+  service:
+    type: NodePort
+    port: 8000
+    targetPort: 8000
+    nodePort: 30081
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  env:
+    # Database configuration (will be overridden by secrets)
+    DATABASE_URL: ""
+    # JWT configuration (will be overridden by secrets)
+    JWT_SECRET: ""
+    JWT_ALGORITHM: "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+    # CORS configuration
+    CORS_ORIGINS: '["http://localhost:3000","http://localhost:30080"]'
+
+# Secrets (base64 encoded values should be provided during installation)
+secrets:
+  databaseUrl: ""  # Base64 encoded DATABASE_URL
+  jwtSecret: ""    # Base64 encoded JWT_SECRET
+  betterAuthSecret: ""  # Base64 encoded BETTER_AUTH_SECRET
+
+# ConfigMap data
+config:
+  environment: "production"
+  logLevel: "info"
