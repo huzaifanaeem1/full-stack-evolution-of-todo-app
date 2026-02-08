@@ -1,13 +1,19 @@
 <!-- SYNC IMPACT REPORT:
-Version change: N/A -> 1.0.0
-Modified principles: None (new constitution)
-Added sections: All sections (new constitution)
+Version change: 1.0.0 -> 1.1.0
+Modified principles: None
+Added sections:
+- Phase IV: Local Kubernetes Deployment (new section)
+- Kubernetes Architecture Principles (new section)
+- AI DevOps Tools Integration (new section)
+- Docker and Container Requirements (new section)
+- Helm Chart Standards (new section)
+- Deployment Discipline Rules (new section)
 Removed sections: None
 Templates requiring updates:
-- .specify/templates/plan-template.md: ✅ updated
-- .specify/templates/spec-template.md: ✅ updated
-- .specify/templates/tasks-template.md: ✅ updated
-- .specify/templates/commands/*.md: ✅ reviewed
+- .specify/templates/plan-template.md: ✅ reviewed (no changes needed)
+- .specify/templates/spec-template.md: ✅ reviewed (no changes needed)
+- .specify/templates/tasks-template.md: ✅ reviewed (no changes needed)
+- .specify/templates/commands/*.md: ✅ reviewed (no changes needed)
 Follow-up TODOs: None
 -->
 
@@ -81,6 +87,43 @@ Implementation restricted to requirements specified in the constitution; No addi
 ### Consistent JWT Secret Sharing
 Same JWT secret must be used across frontend and backend; Secure transmission and storage of the secret; Proper environment configuration for both services.
 
+## Phase IV: Local Kubernetes Deployment Principles
+
+### Strict Spec-Driven Deployment (NON-NEGOTIABLE)
+All deployment work must follow Specify → Plan → Tasks → Implement sequence; No deployment action may occur without an approved task; No Kubernetes or Docker configuration may be written without specification; Skipping any step is strictly forbidden.
+
+### No Manual Trial-and-Error Deployment
+Manual trial-and-error deployment is strictly prohibited; All deployment steps must be planned and documented; Configuration changes must be version-controlled and reviewed; Improvisation without documentation is forbidden.
+
+### Existing Application Code Immutability
+Phase III application code must not be modified during Phase IV; Deployment focuses on infrastructure automation only; No feature changes or code refactoring allowed; Phase III functionality must remain unchanged.
+
+### AI DevOps Tools Integration
+Docker images must be generated via AI agents where possible; Helm charts must be generated via kubectl-ai or kagent where possible; AI DevOps tools assist but do not replace validation; If Gordon or other AI tools are unavailable, fallback must be documented, not improvised.
+
+### Kubernetes as Single Runtime Target
+Kubernetes is the single runtime target for deployment; All services must be deployable on Kubernetes clusters; Minikube used for local development and testing; No alternative container orchestration platforms.
+
+### Docker Image Immutability
+Docker images must be immutable once built; No runtime modifications to container images; Version tags must be explicit and meaningful; Image rebuilds required for any changes.
+
+### Configuration Externalization
+All configuration must be externalized from application code; Environment variables, ConfigMaps, and Secrets used for configuration; No hardcoded configuration in Docker images; Configuration changes must not require image rebuilds.
+
+### Independent Service Deployment
+Services must be deployable independently; Frontend, backend, and database as separate deployable units; Each service has its own Helm chart or deployment manifest; Service dependencies managed through Kubernetes service discovery.
+
+### Helm Charts as Deployment Contract
+Helm charts define the deployment contract for all services; Charts must be version-controlled and documented; Chart values must be externalized for environment-specific configuration; Helm used as the primary deployment mechanism.
+
+## Phase IV: Scope Boundaries
+
+### In Scope for Phase IV
+Dockerizing frontend and backend applications; Creating Helm charts for all services; Deploying to local Minikube cluster; AI-assisted Docker and Kubernetes operations; Infrastructure automation and deployment discipline.
+
+### Out of Scope for Phase IV
+Feature changes or enhancements; Kafka or Dapr integration; Cloud provider deployments (AWS, GCP, Azure); CI/CD pipeline implementation; Application code modifications.
+
 ## Development Workflow
 
 ### Test-First Approach
@@ -94,6 +137,6 @@ All changes must undergo peer review; Security and architecture compliance verif
 
 ## Governance
 
-All development must comply with this constitution; Amendments require formal approval process; Code reviews must verify constitution compliance; Deviations require explicit exception approval.
+All development must comply with this constitution; Amendments require formal approval process; Code reviews must verify constitution compliance; Deviations require explicit exception approval; Phase IV deployment must follow strict Spec-Driven Development discipline; Agent behavior must stop and ask for clarification when encountering ambiguity rather than guessing or inventing configuration.
 
-**Version**: 1.0.0 | **Ratified**: 2026-01-09 | **Last Amended**: 2026-01-09
+**Version**: 1.1.0 | **Ratified**: 2026-01-09 | **Last Amended**: 2026-02-08
