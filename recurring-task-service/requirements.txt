@@ -1,0 +1,11 @@
+# T011: Requirements for Recurring Task Service
+# Phase V - Part B: Event-Driven Architecture with Kafka and Dapr
+
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+pydantic-settings==2.1.0
+dapr==1.12.0
+sqlmodel==0.0.14
+psycopg2-binary==2.9.9
+python-dateutil==2.8.2

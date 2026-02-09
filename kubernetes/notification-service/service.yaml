@@ -1,0 +1,19 @@
+# T085: Notification Service Kubernetes Service
+# Phase V - Part B: Event-Driven Architecture with Kafka and Dapr
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+  namespace: default
+  labels:
+    app: notification-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8002
+    targetPort: 8002
+    protocol: TCP
+    name: http
+  selector:
+    app: notification-service

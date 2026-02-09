@@ -17,6 +17,7 @@ export const TaskItem = ({ task, onTaskUpdated, onTaskDeleted }: TaskItemProps) 
   const [description, setDescription] = useState(task.description || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [generatingRecurrence, setGeneratingRecurrence] = useState(false); // T118: Add state for generating recurrence
 
   const handleToggleComplete = async () => {
     setLoading(true);
@@ -95,8 +96,46 @@ export const TaskItem = ({ task, onTaskUpdated, onTaskDeleted }: TaskItemProps) 
     }
   };
 
+  // T118: Add handler for generating next recurring instance
+  const handleGenerateRecurrence = async () => {
+    setGeneratingRecurrence(true);
+    setError(null);
+    try {
+      const userId = getUserId();
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      const newTask = await taskAPI.generateRecurrence(userId, task.id);
+
+      // Notify parent component about the new task
+      onTaskUpdated(newTask);
+
+      alert('Next recurring task instance created successfully!');
+    } catch (err: any) {
+      setError(err.response?.data?.detail || err.message || 'Failed to generate recurring task');
+    } finally {
+      setGeneratingRecurrence(false);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString();
+  };
+
+  // T047: Helper function to format due date
+  const formatDueDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  // T048: Helper function to check if task is overdue
+  const isOverdue = (dueDate: string | undefined) => {
+    if (!dueDate || task.is_completed) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const due = new Date(dueDate);
+    due.setHours(0, 0, 0, 0);
+    return due < today;
   };
 
   if (isEditing) {
@@ -199,6 +238,83 @@ export const TaskItem = ({ task, onTaskUpdated, onTaskDeleted }: TaskItemProps) 
             }`}>
               {task.description}
             </p>
+          )}
+
+          {/* T033: Display priority badge in TaskList component */}
+          {/* T034: Add priority color coding (red=high, yellow=medium, green=low) */}
+          <div className="mt-3 flex items-center">
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+              task.priority === 'high'
+                ? 'bg-red-900/30 text-red-400 border border-red-500/30'
+                : task.priority === 'medium'
+                ? 'bg-yellow-900/30 text-yellow-400 border border-yellow-500/30'
+                : 'bg-green-900/30 text-green-400 border border-green-500/30'
+            }`}>
+              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clipRule="evenodd" />
+              </svg>
+              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
+            </span>
+          </div>
+
+          {/* T047: Display due date in TaskList component */}
+          {/* T048: Add overdue indicator for past due dates */}
+          {task.due_date && (
+            <div className="mt-2">
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                isOverdue(task.due_date)
+                  ? 'bg-red-900/30 text-red-400 border border-red-500/30'
+                  : 'bg-blue-900/30 text-blue-400 border border-blue-500/30'
+              }`}>
+                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                {isOverdue(task.due_date) ? '⚠️ Overdue: ' : 'Due: '}
+                {formatDueDate(task.due_date)}
+              </span>
+            </div>
+          )}
+
+          {/* T071: Display tags as chips in TaskList */}
+          {task.tags && task.tags.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {task.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-900/30 text-purple-300 border border-purple-500/30"
+                >
+                  <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* T117: Display recurring indicator icon in TaskList */}
+          {task.is_recurring && (
+            <div className="mt-2">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-900/30 text-cyan-400 border border-cyan-500/30">
+                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Recurring ({task.recurrence_frequency})
+              </span>
+            </div>
+          )}
+
+          {/* T118: Add "Generate Next" button for recurring tasks */}
+          {task.is_recurring && task.due_date && (
+            <div className="mt-3">
+              <button
+                onClick={handleGenerateRecurrence}
+                disabled={generatingRecurrence || loading}
+                className="px-3 py-1.5 text-xs bg-cyan-600/30 border border-cyan-500/30 rounded-lg hover:bg-cyan-600/50 disabled:opacity-50 disabled:cursor-not-allowed text-cyan-300 transition-all duration-200"
+              >
+                {generatingRecurrence ? 'Generating...' : '🔄 Generate Next Instance'}
+              </button>
+            </div>
           )}
 
           <div className="mt-3 flex flex-wrap gap-3 text-xs text-gray-500">

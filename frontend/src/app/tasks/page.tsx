@@ -6,11 +6,14 @@ import Link from 'next/link';
 import { Task } from '@/src/types';
 import { TaskList } from '@/src/components/TaskList';
 import { TaskForm } from '@/src/components/TaskForm';
+import { TaskFilters } from '@/src/components/TaskFilters'; // T094: Import TaskFilters
 import { taskAPI } from '@/src/services/api';
 import { isAuthenticated, getUserId } from '@/src/services/auth';
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]); // T094: Add available tags state
+  const [filters, setFilters] = useState<any>({}); // T094: Add filters state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -23,7 +26,15 @@ export default function TasksPage() {
     }
 
     fetchTasks();
+    fetchAvailableTags(); // T094: Fetch available tags
   }, []);
+
+  // T094: Refetch tasks when filters change
+  useEffect(() => {
+    if (isAuthenticated()) {
+      fetchTasks();
+    }
+  }, [filters]);
 
   const fetchTasks = async () => {
     try {
@@ -32,7 +43,7 @@ export default function TasksPage() {
       if (!userId) {
         throw new Error('User not authenticated');
       }
-      const tasks = await taskAPI.getTasks(userId);
+      const tasks = await taskAPI.getTasks(userId, filters); // T094: Pass filters
       setTasks(tasks);
       setError(null);
     } catch (err: any) {
@@ -47,8 +58,26 @@ export default function TasksPage() {
     }
   };
 
+  // T094: Fetch available tags for filter
+  const fetchAvailableTags = async () => {
+    try {
+      const userId = getUserId();
+      if (!userId) return;
+      const tags = await taskAPI.getTags(userId);
+      setAvailableTags(tags);
+    } catch (err: any) {
+      console.error('Failed to fetch tags:', err);
+    }
+  };
+
+  // T094: Handle filter changes
+  const handleFiltersChange = (newFilters: any) => {
+    setFilters(newFilters);
+  };
+
   const handleTaskCreated = (newTask: Task) => {
     setTasks(prev => [newTask, ...prev]);
+    fetchAvailableTags(); // T094: Refresh tags when new task is created
   };
 
   const handleTaskUpdated = (updatedTask: Task) => {
@@ -108,6 +137,12 @@ export default function TasksPage() {
           </div>
           <TaskForm onTaskCreated={handleTaskCreated} />
         </div>
+
+        {/* T094: Integrate TaskFilters with task list page */}
+        <TaskFilters
+          onFiltersChange={handleFiltersChange}
+          availableTags={availableTags}
+        />
 
         <div className="bg-gradient-to-br from-purple-900/20 to-black/50 border border-purple-500/30 rounded-xl overflow-hidden backdrop-blur-sm">
           <div className="p-4 sm:p-6 border-b border-purple-500/20">

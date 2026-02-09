@@ -1,0 +1,63 @@
+# T060-T061: Recurring Task Service Kubernetes Deployment
+# Phase V - Part B: Event-Driven Architecture with Kafka and Dapr
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recurring-task-service
+  namespace: default
+  labels:
+    app: recurring-task-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recurring-task-service
+  template:
+    metadata:
+      annotations:
+        # T061: Dapr sidecar annotations
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "recurring-task-service"
+        dapr.io/app-port: "8001"
+        dapr.io/log-level: "info"
+      labels:
+        app: recurring-task-service
+    spec:
+      containers:
+      - name: recurring-task-service
+        image: recurring-task-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8001
+          name: http
+          protocol: TCP
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: todo-chatbot-secrets
+              key: database-url
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

@@ -1,20 +1,32 @@
 <!-- SYNC IMPACT REPORT:
-Version change: 1.0.0 -> 1.1.0
+Version change: 1.2.0 -> 1.3.0
 Modified principles: None
 Added sections:
-- Phase IV: Local Kubernetes Deployment (new section)
-- Kubernetes Architecture Principles (new section)
-- AI DevOps Tools Integration (new section)
-- Docker and Container Requirements (new section)
-- Helm Chart Standards (new section)
-- Deployment Discipline Rules (new section)
+- Phase V - Part B: Event-Driven Architecture with Kafka and Dapr Principles (new section)
+- Phase V - Part B: Architecture Principles (new section)
+- Phase V - Part B: Scope Boundaries (new section)
+- Strict Spec-Driven Event Architecture (NON-NEGOTIABLE) (new principle)
+- Event-First Communication Mandate (new principle)
+- Dapr as Infrastructure Abstraction (new principle)
+- Event Consumer Idempotency Requirement (new principle)
+- Service Statelessness and Isolation (new principle)
+- Event Immutability Guarantee (new principle)
+- Existing Feature Preservation (new principle)
+- No Cloud-Specific Logic (new principle)
+- Ambiguity Resolution Protocol (new principle)
+- Event Producer Independence (new principle)
+- Asynchronous Task Processing (new principle)
+- Service Separation and Boundaries (new principle)
+- Failure Isolation and Recovery (new principle)
 Removed sections: None
 Templates requiring updates:
-- .specify/templates/plan-template.md: ✅ reviewed (no changes needed)
+- .specify/templates/plan-template.md: ⚠ pending (may need Phase V - Part B constitution checks)
 - .specify/templates/spec-template.md: ✅ reviewed (no changes needed)
 - .specify/templates/tasks-template.md: ✅ reviewed (no changes needed)
 - .specify/templates/commands/*.md: ✅ reviewed (no changes needed)
-Follow-up TODOs: None
+Follow-up TODOs:
+- Consider adding Phase V - Part B specific constitution checks to plan-template.md
+- Verify Dapr and Kafka deployment requirements align with Kubernetes principles from Phase IV
 -->
 
 # Todo Full-Stack Web Application Constitution
@@ -124,6 +136,79 @@ Dockerizing frontend and backend applications; Creating Helm charts for all serv
 ### Out of Scope for Phase IV
 Feature changes or enhancements; Kafka or Dapr integration; Cloud provider deployments (AWS, GCP, Azure); CI/CD pipeline implementation; Application code modifications.
 
+## Phase V - Part A: Advanced and Intermediate Features Principles
+
+### Strict Spec-Driven Development for Features (NON-NEGOTIABLE)
+All Phase V - Part A work must follow the exact sequence: Specify → Plan → Tasks → Implement; No code may be written without an approved task; Every task must trace back to a specification item; No feature may be added unless explicitly specified; Skipping or combining steps is strictly forbidden.
+
+### Application-Level Focus Only
+Phase V - Part A focuses strictly on application-level behavior and intelligence; No infrastructure changes allowed (Kubernetes, Docker, Helm remain unchanged); No Kafka, Dapr, or cloud deployment logic permitted; Existing Phase I-IV functionality must not break; All enhancements are feature additions to the existing deployed system.
+
+### Feature Traceability Mandate
+Every feature implementation must trace back to specification; No feature may be added unless explicitly specified in Phase V - Part A spec; Ambiguity must result in stopping and asking clarifying questions; Manual coding is discouraged; agents must be used for implementation.
+
+### Backward Compatibility Guarantee
+All existing Phase I-IV functionality must continue to work; No breaking changes to existing APIs or data models; New features must be additive only; Existing user data and workflows must remain intact.
+
+## Phase V - Part A: Scope Boundaries
+
+### In Scope for Phase V - Part A
+Task priorities (high, medium, low priority levels); Tags and categories for task organization; Search, filter, and sort capabilities for tasks; Due dates and deadline management; Recurring tasks (business logic only, no notification infrastructure); Advanced task organization and intelligent behavior; API enhancements for new features; AI chatbot integration for new capabilities.
+
+### Out of Scope for Phase V - Part A
+Kafka message broker integration; Dapr sidecar or service mesh; Push notifications or email notifications; Cloud deployment changes (AWS, GCP, Azure); Kubernetes configuration modifications; Docker image changes; Helm chart updates; Infrastructure or deployment changes of any kind; Breaking changes to existing Phase I-IV features.
+
+## Phase V - Part B: Event-Driven Architecture with Kafka and Dapr Principles
+
+### Strict Spec-Driven Event Architecture (NON-NEGOTIABLE)
+All Phase V - Part B work must follow the exact sequence: Specify → Plan → Tasks → Implement; No event or service may be created without specification; No Kafka topic may exist unless specified in the specification document; Every event schema must be documented before implementation; Skipping or merging steps is strictly forbidden.
+
+### Event-First Communication Mandate
+Services must communicate via events, not direct calls; Event producers must not depend on consumers; Synchronous HTTP calls between services are prohibited where events are applicable; Dapr Pub/Sub must be used as the abstraction layer for event communication; Manual wiring of Kafka clients is discouraged when Dapr is applicable.
+
+### Dapr as Infrastructure Abstraction
+Dapr must be used as the abstraction layer wherever possible; Dapr sidecars handle infrastructure concerns (pub/sub, state, bindings); Application code must not contain Kafka-specific client logic when Dapr can abstract it; Dapr components define infrastructure bindings declaratively; Services remain portable across infrastructure changes through Dapr abstraction.
+
+### Event Consumer Idempotency Requirement
+Event consumers must be idempotent; Processing the same event multiple times must produce the same result; Event handlers must handle duplicate deliveries gracefully; State changes must be designed for at-least-once delivery semantics; No side effects that cannot be safely repeated.
+
+### Service Statelessness and Isolation
+Services must be stateless; All state must be externalized to databases or state stores; Failures must be isolated to individual services; One service failure must not cascade to others; Services scale independently based on event load.
+
+### Event Immutability Guarantee
+Events are immutable once published; No modification or deletion of published events allowed; Event versioning must be used for schema evolution; New event versions must be backward compatible or handled explicitly; Event sourcing principles apply where events represent facts.
+
+### Existing Feature Preservation
+Existing Part A features must not be modified during Part B implementation; Event-driven architecture is additive, not replacement; Synchronous REST APIs remain for client-facing operations; Internal service communication transitions to events; User-facing functionality must remain unchanged.
+
+### No Cloud-Specific Logic
+No cloud provider-specific deployment logic allowed; Infrastructure must remain cloud-agnostic through Dapr; Kafka and Dapr configurations must work on any Kubernetes cluster; No AWS, GCP, or Azure-specific services or APIs; Local development must use Minikube with same configurations.
+
+### Ambiguity Resolution Protocol
+Ambiguity must result in stopping and requesting clarification; No guessing about event schemas, topic names, or service boundaries; Agent must ask explicit questions when specifications are unclear; Manual trial-and-error is prohibited; All decisions must be documented in specifications.
+
+## Phase V - Part B: Architecture Principles
+
+### Event Producer Independence
+Event producers must not depend on consumers; Producers publish events without knowledge of subscribers; Adding or removing consumers must not require producer changes; Loose coupling enforced through event-driven design; Services discover events through topic subscriptions, not direct references.
+
+### Asynchronous Task Processing
+Core operations publish events for asynchronous processing; Long-running tasks must be handled by specialized consumer services; Synchronous request-response limited to user-facing APIs; Background processing decoupled from user requests; Event-driven workflows enable scalability and resilience.
+
+### Service Separation and Boundaries
+Services must be separated by business capability; Each service owns its domain events and data; Clear bounded contexts define service responsibilities; No shared databases between services; Inter-service communication only through events.
+
+### Failure Isolation and Recovery
+Failures must be isolated to individual services; Dead letter queues handle failed event processing; Retry policies defined per consumer; Circuit breakers prevent cascade failures; Observability enables failure detection and diagnosis.
+
+## Phase V - Part B: Scope Boundaries
+
+### In Scope for Phase V - Part B
+Kafka topics and event schemas; Event publishing from core services; Event consumption by specialized services; Dapr Pub/Sub component configuration; Asynchronous task processing workflows; Service separation and decoupling; Event-driven architecture patterns; Kafka and Dapr deployment on Kubernetes; Local development with Minikube and Dapr.
+
+### Out of Scope for Phase V - Part B
+Cloud provider-specific deployments (AWS, GCP, Azure); CI/CD pipeline implementation; Monitoring and observability stacks (Prometheus, Grafana); UI changes or frontend modifications; Breaking changes to existing Part A features; Real-time push notifications to clients; Email or SMS notification infrastructure; Production-grade Kafka cluster management.
+
 ## Development Workflow
 
 ### Test-First Approach
@@ -139,4 +224,4 @@ All changes must undergo peer review; Security and architecture compliance verif
 
 All development must comply with this constitution; Amendments require formal approval process; Code reviews must verify constitution compliance; Deviations require explicit exception approval; Phase IV deployment must follow strict Spec-Driven Development discipline; Agent behavior must stop and ask for clarification when encountering ambiguity rather than guessing or inventing configuration.
 
-**Version**: 1.1.0 | **Ratified**: 2026-01-09 | **Last Amended**: 2026-02-08
+**Version**: 1.3.0 | **Ratified**: 2026-01-09 | **Last Amended**: 2026-02-09

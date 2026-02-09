@@ -1,0 +1,8 @@
+# T012: Requirements for Notification Service
+# Phase V - Part B: Event-Driven Architecture with Kafka and Dapr
+
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+pydantic-settings==2.1.0
+dapr==1.12.0

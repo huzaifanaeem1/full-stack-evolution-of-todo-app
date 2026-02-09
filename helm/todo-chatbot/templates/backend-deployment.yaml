@@ -11,6 +11,12 @@ spec:
       {{- include "todo-chatbot.backend.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      annotations:
+        # T036: Dapr sidecar annotations for event publishing
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "chat-api-service"
+        dapr.io/app-port: "8000"
+        dapr.io/log-level: "info"
       labels:
         {{- include "todo-chatbot.backend.selectorLabels" . | nindent 8 }}
     spec:

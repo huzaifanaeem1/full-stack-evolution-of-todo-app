@@ -1,0 +1,33 @@
+# T015: Dapr Pub/Sub Component Configuration for Kafka
+# Phase V - Part B: Event-Driven Architecture with Kafka and Dapr
+
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: pubsub-kafka
+  namespace: default
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+  # Kafka broker connection
+  - name: brokers
+    value: "kafka:9092"
+  # Consumer group for this component
+  - name: consumerGroup
+    value: "dapr-consumer-group"
+  # Authentication type (none for local development)
+  - name: authType
+    value: "none"
+  # Maximum message size (1MB)
+  - name: maxMessageBytes
+    value: "1048576"
+  # Client ID for Kafka connection
+  - name: clientID
+    value: "dapr-pubsub-kafka"
+  # Enable idempotent producer
+  - name: enableIdempotence
+    value: "true"
+  # Topic configuration
+  - name: initialOffset
+    value: "newest"

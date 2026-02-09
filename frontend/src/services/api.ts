@@ -92,9 +92,32 @@ export const authAPI = {
 
 // Task API functions
 export const taskAPI = {
-  getTasks: async (userId: string): Promise<Task[]> => {
+  // T086: Update getTasks API function with filter parameters
+  getTasks: async (
+    userId: string,
+    filters?: {
+      search?: string;
+      status?: string;
+      priority?: string;
+      tags?: string[];
+      sort_by?: string;
+      sort_order?: string;
+    }
+  ): Promise<Task[]> => {
     try {
-      const response = await apiClient.get(`/${userId}/tasks`);
+      const params = new URLSearchParams();
+
+      if (filters?.search) params.append('search', filters.search);
+      if (filters?.status) params.append('status', filters.status);
+      if (filters?.priority) params.append('priority', filters.priority);
+      if (filters?.tags && filters.tags.length > 0) params.append('tags', filters.tags.join(','));
+      if (filters?.sort_by) params.append('sort_by', filters.sort_by);
+      if (filters?.sort_order) params.append('sort_order', filters.sort_order);
+
+      const queryString = params.toString();
+      const url = `/${userId}/tasks${queryString ? `?${queryString}` : ''}`;
+
+      const response = await apiClient.get(url);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.detail || error.message || 'Failed to fetch tasks');
@@ -142,6 +165,26 @@ export const taskAPI = {
       await apiClient.delete(`/${userId}/tasks/${taskId}`);
     } catch (error: any) {
       throw new Error(error.response?.data?.detail || error.message || 'Failed to delete task');
+    }
+  },
+
+  // T069: Add getTags API function
+  getTags: async (userId: string): Promise<string[]> => {
+    try {
+      const response = await apiClient.get(`/${userId}/tags`);
+      return response.data.map((tag: any) => tag.name);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || error.message || 'Failed to fetch tags');
+    }
+  },
+
+  // T113: Add generateRecurrence API function
+  generateRecurrence: async (userId: string, taskId: string): Promise<Task> => {
+    try {
+      const response = await apiClient.post(`/${userId}/tasks/${taskId}/generate-recurrence`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || error.message || 'Failed to generate recurring task instance');
     }
   }
 };
