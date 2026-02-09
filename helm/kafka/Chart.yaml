@@ -1,0 +1,16 @@
+# T048: Kafka Helm Chart metadata
+# Phase V - Part C: Production Cloud Deployment
+apiVersion: v2
+name: kafka
+description: Apache Kafka message broker for event-driven architecture
+type: application
+version: 1.0.0
+appVersion: "7.5.0"
+keywords:
+  - kafka
+  - messaging
+  - event-streaming
+  - pub-sub
+maintainers:
+  - name: Todo App Team
+    email: team@example.com

@@ -1,0 +1,49 @@
+# T054: PersistentVolumeClaim template for Kafka and Zookeeper storage
+# Phase V - Part C: Production Cloud Deployment
+# Note: StatefulSets use volumeClaimTemplates, but this provides a standalone PVC option
+
+{{- if and .Values.kafka.persistence.enabled (not .Values.kafka.enabled) }}
+# Standalone Kafka PVC (when not using StatefulSet)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kafka-data
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: kafka
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  accessModes:
+    - {{ .Values.kafka.persistence.accessMode }}
+  {{- if .Values.kafka.persistence.storageClass }}
+  storageClassName: {{ .Values.kafka.persistence.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.kafka.persistence.size }}
+{{- end }}
+---
+{{- if and .Values.zookeeper.persistence.enabled (not .Values.zookeeper.enabled) }}
+# Standalone Zookeeper PVC (when not using StatefulSet)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zookeeper-data
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: zookeeper
+    app.kubernetes.io/name: zookeeper
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  accessModes:
+    - {{ .Values.zookeeper.persistence.accessMode }}
+  {{- if .Values.zookeeper.persistence.storageClass }}
+  storageClassName: {{ .Values.zookeeper.persistence.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.zookeeper.persistence.size }}
+{{- end }}

@@ -1,0 +1,47 @@
+# T011: Umbrella Chart metadata and dependencies
+apiVersion: v2
+name: todo-app
+description: Todo Application - Complete stack deployment with event-driven architecture
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - todo
+  - kubernetes
+  - helm
+  - dapr
+  - kafka
+  - event-driven
+maintainers:
+  - name: Todo App Team
+    email: team@todo-app.com
+
+# Dependencies - all subcharts that make up the complete application
+dependencies:
+  # Core Services (User Story 1 - P1)
+  - name: frontend
+    version: 1.0.0
+    repository: "file://charts/frontend"
+    condition: frontend.enabled
+  - name: backend
+    version: 1.0.0
+    repository: "file://charts/backend"
+    condition: backend.enabled
+
+  # Event-Driven Services (User Story 2 - P2)
+  - name: kafka
+    version: 1.0.0
+    repository: "file://charts/kafka"
+    condition: kafka.enabled
+  - name: dapr-components
+    version: 1.0.0
+    repository: "file://charts/dapr-components"
+    condition: daprComponents.enabled
+  - name: recurring-task-service
+    version: 1.0.0
+    repository: "file://charts/recurring-task-service"
+    condition: recurringTaskService.enabled
+  - name: notification-service
+    version: 1.0.0
+    repository: "file://charts/notification-service"
+    condition: notificationService.enabled

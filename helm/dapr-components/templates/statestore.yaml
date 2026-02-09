@@ -1,0 +1,46 @@
+# T061: Dapr State Store component template (optional)
+# Phase V - Part C: Production Cloud Deployment
+{{- if .Values.statestore.enabled }}
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: {{ .Values.statestore.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Values.statestore.name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- range $key, $value := .Values.labels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  type: {{ .Values.statestore.type }}
+  version: {{ .Values.statestore.version }}
+  metadata:
+  # Redis host connection
+  - name: redisHost
+    value: {{ .Values.statestore.redis.host | quote }}
+  # Redis password (if required)
+  {{- if .Values.statestore.redis.password }}
+  - name: redisPassword
+    secretKeyRef:
+      name: redis-credentials
+      key: password
+  {{- end }}
+  # Enable TLS
+  - name: enableTLS
+    value: {{ .Values.statestore.redis.enableTLS | quote }}
+  # Key prefix for state keys
+  - name: keyPrefix
+    value: {{ .Values.statestore.metadata.keyPrefix | quote }}
+  # Actor state store
+  - name: actorStateStore
+    value: {{ .Values.statestore.metadata.actorStateStore | quote }}
+  {{- if .Values.scopes.statestore }}
+  # Scopes - which apps can access this component
+scopes:
+  {{- range .Values.scopes.statestore }}
+  - {{ . }}
+  {{- end }}
+  {{- end }}
+{{- end }}

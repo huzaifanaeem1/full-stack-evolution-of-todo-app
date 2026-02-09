@@ -1,0 +1,150 @@
+# T049: Kafka Helm Chart values with Kafka and Zookeeper configuration
+# Phase V - Part C: Production Cloud Deployment
+
+global:
+  namespace: todo-app
+
+# Kafka broker configuration
+kafka:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: confluentinc/cp-kafka
+    tag: "7.5.0"
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 9092
+    targetPort: 9092
+
+  # Kafka broker configuration
+  config:
+    # Broker settings
+    offsetsTopicReplicationFactor: 1
+    transactionStateLogReplicationFactor: 1
+    transactionStateLogMinIsr: 1
+    defaultReplicationFactor: 1
+    minInsyncReplicas: 1
+    numPartitions: 3
+
+    # Log settings
+    logRetentionHours: 168  # 7 days
+    logSegmentBytes: 1073741824  # 1GB
+
+    # Performance settings
+    numNetworkThreads: 3
+    numIoThreads: 8
+    socketSendBufferBytes: 102400
+    socketReceiveBufferBytes: 102400
+    socketRequestMaxBytes: 104857600
+
+  # Resource requests and limits
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+  # Persistent storage
+  persistence:
+    enabled: true
+    storageClass: ""  # Use default storage class
+    accessMode: ReadWriteOnce
+    size: 10Gi
+
+  # Liveness and readiness probes
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+# Zookeeper configuration
+zookeeper:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: confluentinc/cp-zookeeper
+    tag: "7.5.0"
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 2181
+    targetPort: 2181
+    peerPort: 2888
+    leaderElectionPort: 3888
+
+  # Zookeeper configuration
+  config:
+    tickTime: 2000
+    initLimit: 10
+    syncLimit: 5
+    maxClientCnxns: 60
+    autopurgeSnapRetainCount: 3
+    autopurgePurgeInterval: 24
+
+  # Resource requests and limits
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+  # Persistent storage
+  persistence:
+    enabled: true
+    storageClass: ""  # Use default storage class
+    accessMode: ReadWriteOnce
+    size: 5Gi
+
+  # Liveness and readiness probes
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsNonRoot: true
+
+# Security context for containers
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity rules
+affinity: {}

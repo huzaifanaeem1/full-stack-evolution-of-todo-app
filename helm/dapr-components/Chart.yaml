@@ -1,0 +1,17 @@
+# T057: Dapr Components Helm Chart metadata
+# Phase V - Part C: Production Cloud Deployment
+apiVersion: v2
+name: dapr-components
+description: Dapr components for event-driven architecture (Pub/Sub, State Store)
+type: application
+version: 1.0.0
+appVersion: "1.12.0"
+keywords:
+  - dapr
+  - components
+  - pubsub
+  - statestore
+  - event-driven
+maintainers:
+  - name: Todo App Team
+    email: team@example.com

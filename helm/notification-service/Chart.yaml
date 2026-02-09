@@ -1,0 +1,16 @@
+# T069: Notification Service Helm Chart metadata
+# Phase V - Part C: Production Cloud Deployment
+apiVersion: v2
+name: notification-service
+description: Notification Service for event-driven notifications and alerts
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - notifications
+  - alerts
+  - event-driven
+  - dapr
+maintainers:
+  - name: Todo App Team
+    email: team@example.com

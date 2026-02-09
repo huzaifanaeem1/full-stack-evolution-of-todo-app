@@ -1,0 +1,167 @@
+# T012: Default values for umbrella chart (Minikube/local development)
+# Global configuration shared across all subcharts
+global:
+  # Namespace for all resources
+  namespace: todo-app
+
+  # Image registry and pull configuration
+  imageRegistry: docker.io
+  imageTag: latest
+  imagePullPolicy: IfNotPresent
+  imagePullSecrets: []
+
+  # Secrets configuration (values provided via --set or external secret management)
+  secrets:
+    databaseUrl: ""  # PostgreSQL connection string (required)
+    jwtSecret: ""    # JWT secret for authentication (required)
+
+# Frontend service configuration
+frontend:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: LoadBalancer
+    port: 80
+    targetPort: 3000
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# Backend service configuration
+backend:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  dapr:
+    enabled: true
+    appId: backend
+    appPort: 8000
+    logLevel: info
+  service:
+    type: ClusterIP
+    port: 8000
+    targetPort: 8000
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+# Kafka configuration
+kafka:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: confluentinc/cp-kafka
+    tag: 7.5.0
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 10Gi
+  service:
+    type: ClusterIP
+    port: 9092
+
+# Zookeeper configuration (for Kafka)
+zookeeper:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: confluentinc/cp-zookeeper
+    tag: 7.5.0
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 5Gi
+
+# Dapr components configuration
+daprComponents:
+  enabled: true
+  pubsub:
+    enabled: true
+    name: pubsub-kafka
+    type: pubsub.kafka
+    version: v1
+    metadata:
+      brokers: "kafka:9092"
+      consumerGroup: "dapr-consumer-group"
+      authType: "none"
+
+# Recurring Task Service configuration
+recurringTaskService:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: recurring-task-service
+    tag: latest
+    pullPolicy: IfNotPresent
+  dapr:
+    enabled: true
+    appId: recurring-task-service
+    appPort: 8001
+    logLevel: info
+  service:
+    type: ClusterIP
+    port: 8001
+    targetPort: 8001
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# Notification Service configuration
+notificationService:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: notification-service
+    tag: latest
+    pullPolicy: IfNotPresent
+  dapr:
+    enabled: true
+    appId: notification-service
+    appPort: 8002
+    logLevel: info
+  service:
+    type: ClusterIP
+    port: 8002
+    targetPort: 8002
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi

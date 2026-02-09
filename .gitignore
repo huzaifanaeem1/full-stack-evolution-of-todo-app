@@ -83,6 +83,13 @@ kubeconfig*
 *.key
 *.crt
 
+# Helm (T121)
+charts/*.tgz
+Chart.lock
+**/charts/
+helm/*/charts/
+*.tgz
+
 # Docker
 .dockerignore
 

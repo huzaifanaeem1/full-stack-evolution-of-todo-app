@@ -1,0 +1,51 @@
+# T010: Helm ignore file for umbrella chart
+# Patterns to exclude from Helm chart packaging
+
+# Version control
+.git/
+.gitignore
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Documentation (keep only essential docs)
+*.md
+!README.md
+!NOTES.txt
+
+# Test files
+*_test.go
+*_test.py
+test/
+tests/
+__tests__/
+
+# Build artifacts
+*.tgz
+*.tar.gz
+Chart.lock
+charts/*.tgz
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Environment files (secrets should never be in charts)
+.env
+.env.*
+*.secret
+secrets/
+
+# OS files
+Thumbs.db

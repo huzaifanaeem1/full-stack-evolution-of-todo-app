@@ -1,32 +1,34 @@
 <!-- SYNC IMPACT REPORT:
-Version change: 1.2.0 -> 1.3.0
+Version change: 1.3.0 -> 1.4.0
 Modified principles: None
 Added sections:
-- Phase V - Part B: Event-Driven Architecture with Kafka and Dapr Principles (new section)
-- Phase V - Part B: Architecture Principles (new section)
-- Phase V - Part B: Scope Boundaries (new section)
-- Strict Spec-Driven Event Architecture (NON-NEGOTIABLE) (new principle)
-- Event-First Communication Mandate (new principle)
-- Dapr as Infrastructure Abstraction (new principle)
-- Event Consumer Idempotency Requirement (new principle)
-- Service Statelessness and Isolation (new principle)
-- Event Immutability Guarantee (new principle)
-- Existing Feature Preservation (new principle)
-- No Cloud-Specific Logic (new principle)
-- Ambiguity Resolution Protocol (new principle)
-- Event Producer Independence (new principle)
-- Asynchronous Task Processing (new principle)
-- Service Separation and Boundaries (new principle)
-- Failure Isolation and Recovery (new principle)
+- Phase V - Part C: Production Cloud Deployment Principles (new section)
+- Phase V - Part C: Architecture Principles (new section)
+- Phase V - Part C: Scope Boundaries (new section)
+- Strict Helm-Based Deployment (NON-NEGOTIABLE) (new principle)
+- Dapr-Enabled Services Mandate (new principle)
+- Secrets Externalization Requirement (new principle)
+- Cloud-Agnostic Infrastructure (new principle)
+- Production-Grade Kafka Configuration (new principle)
+- Reproducible Deployment Process (new principle)
+- Environment Separation (new principle)
+- Resource Management and Limits (new principle)
+- Helm Chart Structure and Organization (new principle)
+- Dapr Component Configuration (new principle)
+- Service Discovery and Networking (new principle)
+- Observability and Monitoring (new principle)
+- Database and State Management (new principle)
 Removed sections: None
 Templates requiring updates:
-- .specify/templates/plan-template.md: ⚠ pending (may need Phase V - Part B constitution checks)
+- .specify/templates/plan-template.md: ⚠ pending (may need Phase V - Part C constitution checks for Helm and cloud deployment)
 - .specify/templates/spec-template.md: ✅ reviewed (no changes needed)
-- .specify/templates/tasks-template.md: ✅ reviewed (no changes needed)
+- .specify/templates/tasks-template.md: ⚠ pending (may need Phase V - Part C deployment task patterns)
 - .specify/templates/commands/*.md: ✅ reviewed (no changes needed)
 Follow-up TODOs:
-- Consider adding Phase V - Part B specific constitution checks to plan-template.md
-- Verify Dapr and Kafka deployment requirements align with Kubernetes principles from Phase IV
+- Consider adding Phase V - Part C specific constitution checks to plan-template.md for Helm chart validation
+- Verify Helm chart structure aligns with Kubernetes principles from Phase IV
+- Ensure Dapr component configuration patterns are documented in task templates
+- Validate secrets management approach across all deployment templates
 -->
 
 # Todo Full-Stack Web Application Constitution
@@ -209,6 +211,57 @@ Kafka topics and event schemas; Event publishing from core services; Event consu
 ### Out of Scope for Phase V - Part B
 Cloud provider-specific deployments (AWS, GCP, Azure); CI/CD pipeline implementation; Monitoring and observability stacks (Prometheus, Grafana); UI changes or frontend modifications; Breaking changes to existing Part A features; Real-time push notifications to clients; Email or SMS notification infrastructure; Production-grade Kafka cluster management.
 
+## Phase V - Part C: Production Cloud Deployment Principles
+
+### Strict Helm-Based Deployment (NON-NEGOTIABLE)
+All Kubernetes resources must be defined in Helm charts; No raw kubectl apply commands for production resources; Helm charts must be version-controlled and parameterized; Values files must separate environment-specific configuration; Chart dependencies must be explicitly declared and managed.
+
+### Dapr-Enabled Services Mandate
+All microservices must have Dapr sidecars enabled; Dapr annotations must be present in all deployment manifests; Dapr components must be deployed before application services; Service-to-service communication must use Dapr APIs; No direct Kafka client usage in application code.
+
+### Secrets Externalization Requirement
+No hardcoded secrets in any configuration files; Kubernetes Secrets must be used for sensitive data; Environment variables must reference Secrets, not contain values; Database credentials, JWT secrets, API keys must be externalized; Secrets must never be committed to version control.
+
+### Cloud-Agnostic Infrastructure
+Infrastructure must work on any Kubernetes cluster (Minikube, GKE, EKS, AKS); No cloud provider-specific APIs or services in application code; Storage, networking, and compute must use Kubernetes abstractions; Helm charts must be portable across cloud providers; Local development must mirror production architecture.
+
+### Production-Grade Kafka Configuration
+Kafka must be deployed with replication and persistence; Zookeeper or KRaft mode for Kafka coordination; Proper resource limits and requests for Kafka pods; Topic configuration must support production workloads; Kafka must be accessible to all Dapr-enabled services.
+
+### Reproducible Deployment Process
+Deployment must be fully automated via Helm commands; No manual kubectl edits or patches allowed; All configuration changes must go through Helm values; Rollback must be possible via Helm history; Deployment steps must be documented and repeatable.
+
+### Environment Separation
+Development, staging, and production environments must be separate; Each environment has its own Helm values file; No shared resources between environments; Environment-specific configuration must be externalized; Promotion between environments must be controlled.
+
+### Resource Management and Limits
+All pods must have resource requests and limits defined; CPU and memory allocations must be appropriate for workload; Horizontal Pod Autoscaling (HPA) configured where applicable; Resource quotas enforced at namespace level; No unbounded resource consumption allowed.
+
+## Phase V - Part C: Architecture Principles
+
+### Helm Chart Structure and Organization
+One Helm chart per microservice or logical component; Chart dependencies managed via Chart.yaml requirements; Shared configuration via library charts or subcharts; Values schema validation for type safety; Chart versioning follows semantic versioning.
+
+### Dapr Component Configuration
+Dapr components deployed as Kubernetes CRDs; Component configuration externalized via ConfigMaps; Pub/Sub, State Store, Bindings defined declaratively; Component scoping limits access to authorized services; Component versioning and updates managed via Helm.
+
+### Service Discovery and Networking
+Kubernetes Services for internal service discovery; Ingress controllers for external access; Network policies for service-to-service communication; DNS-based service resolution; No hardcoded IP addresses or hostnames.
+
+### Observability and Monitoring
+Structured logging to stdout/stderr for log aggregation; Health check endpoints for liveness and readiness probes; Metrics exposed for Prometheus scraping; Distributed tracing via Dapr telemetry; Centralized logging and monitoring infrastructure.
+
+### Database and State Management
+Database deployed as StatefulSet or external managed service; Persistent volumes for stateful workloads; Database migrations managed via init containers or jobs; Connection pooling and retry logic in application; Database credentials via Kubernetes Secrets.
+
+## Phase V - Part C: Scope Boundaries
+
+### In Scope for Phase V - Part C
+Helm chart creation for all services; Dapr installation and configuration on Kubernetes; Kafka deployment with Helm; Secrets management with Kubernetes Secrets; Production-grade resource configuration; Cloud-agnostic Kubernetes deployment; Environment-specific values files; Service discovery and networking setup; Database deployment and persistence; Observability and health checks.
+
+### Out of Scope for Phase V - Part C
+Feature development or business logic changes; UI modifications or frontend enhancements; CI/CD pipeline implementation; Cloud provider-specific services (RDS, Cloud SQL, etc.); Monitoring stack deployment (Prometheus, Grafana); Certificate management and TLS configuration; Backup and disaster recovery procedures; Performance testing and load testing; Security scanning and vulnerability assessment.
+
 ## Development Workflow
 
 ### Test-First Approach
@@ -224,4 +277,4 @@ All changes must undergo peer review; Security and architecture compliance verif
 
 All development must comply with this constitution; Amendments require formal approval process; Code reviews must verify constitution compliance; Deviations require explicit exception approval; Phase IV deployment must follow strict Spec-Driven Development discipline; Agent behavior must stop and ask for clarification when encountering ambiguity rather than guessing or inventing configuration.
 
-**Version**: 1.3.0 | **Ratified**: 2026-01-09 | **Last Amended**: 2026-02-09
+**Version**: 1.4.0 | **Ratified**: 2026-01-09 | **Last Amended**: 2026-02-09

@@ -1,0 +1,78 @@
+# T015: Production environment values
+# Overrides for production deployment (cloud Kubernetes)
+
+global:
+  imageTag: v1.0.0  # Use specific version tags in production
+  imagePullPolicy: IfNotPresent
+
+frontend:
+  replicaCount: 3  # High availability with 3 replicas
+  service:
+    type: LoadBalancer
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+backend:
+  replicaCount: 3  # High availability with 3 replicas
+  dapr:
+    logLevel: warn  # Reduce log verbosity in production
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+kafka:
+  replicaCount: 3  # Kafka cluster for production
+  persistence:
+    size: 50Gi  # Large storage for production
+  resources:
+    requests:
+      cpu: 1000m
+      memory: 2Gi
+    limits:
+      cpu: 4000m
+      memory: 8Gi
+
+zookeeper:
+  replicaCount: 3  # Zookeeper ensemble for production
+  persistence:
+    size: 10Gi
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+
+recurringTaskService:
+  replicaCount: 2  # High availability
+  dapr:
+    logLevel: warn
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+notificationService:
+  replicaCount: 2  # High availability
+  dapr:
+    logLevel: warn
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi

@@ -1,0 +1,54 @@
+# T028: Backend values.yaml with Dapr configuration
+# Default values for backend chart
+replicaCount: 2
+
+image:
+  repository: backend
+  tag: latest
+  pullPolicy: IfNotPresent
+
+dapr:
+  enabled: true
+  appId: backend
+  appPort: 8000
+  logLevel: info
+
+service:
+  type: ClusterIP
+  port: 8000
+  targetPort: 8000
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+revisionHistoryLimit: 3
+
+env:
+  LOG_LEVEL: INFO
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

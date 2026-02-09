@@ -1,0 +1,115 @@
+# T063: Recurring Task Service Helm Chart values with Dapr config
+# Phase V - Part C: Production Cloud Deployment
+
+global:
+  namespace: todo-app
+
+# Recurring Task Service configuration
+replicaCount: 1
+
+image:
+  repository: todo-app/recurring-task-service
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+# Image pull secrets (if using private registry)
+imagePullSecrets: []
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 8001
+  targetPort: 8001
+
+# Dapr configuration
+dapr:
+  enabled: true
+  appId: "recurring-task-service"
+  appPort: "8001"
+  appProtocol: "http"
+  logLevel: "info"
+  # Dapr sidecar resource limits
+  sidecarResources:
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+# Environment variables
+env:
+  # Database connection (from secret)
+  databaseUrl:
+    secretName: app-secrets
+    secretKey: DATABASE_URL
+
+  # Dapr Pub/Sub configuration
+  pubsubName: "pubsub-kafka"
+  taskEventsTopic: "task-events"
+  remindersTopic: "reminders"
+
+  # Service configuration
+  checkInterval: "60"  # Check for recurring tasks every 60 seconds
+  logLevel: "info"
+
+# Resource requests and limits
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
+
+# Liveness and readiness probes
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /health
+    port: 8001
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /health
+    port: 8001
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsNonRoot: true
+
+# Security context for containers
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity rules
+affinity: {}
+
+# Pod annotations
+podAnnotations: {}
+
+# Service account
+serviceAccount:
+  create: false
+  name: ""

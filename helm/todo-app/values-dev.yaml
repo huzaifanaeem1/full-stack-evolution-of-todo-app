@@ -1,0 +1,64 @@
+# T013: Development environment values
+# Overrides for local development and Minikube
+
+global:
+  imageTag: dev
+  imagePullPolicy: Always  # Always pull latest dev images
+
+frontend:
+  replicaCount: 1
+  service:
+    type: NodePort  # Use NodePort for Minikube access
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+backend:
+  replicaCount: 1
+  dapr:
+    logLevel: debug  # Verbose logging for development
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+kafka:
+  replicaCount: 1
+  persistence:
+    size: 5Gi  # Smaller storage for dev
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+
+zookeeper:
+  replicaCount: 1
+  persistence:
+    size: 2Gi  # Smaller storage for dev
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+
+recurringTaskService:
+  replicaCount: 1
+  dapr:
+    logLevel: debug
+
+notificationService:
+  replicaCount: 1
+  dapr:
+    logLevel: debug

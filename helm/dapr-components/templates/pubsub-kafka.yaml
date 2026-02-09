@@ -1,0 +1,65 @@
+# T059: Dapr Pub/Sub component template (CRD)
+# T060: Kafka broker address configured
+# Phase V - Part C: Production Cloud Deployment
+{{- if .Values.pubsub.enabled }}
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: {{ .Values.pubsub.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Values.pubsub.name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- range $key, $value := .Values.labels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  type: {{ .Values.pubsub.type }}
+  version: {{ .Values.pubsub.version }}
+  metadata:
+  # Kafka broker connection
+  - name: brokers
+    value: {{ .Values.pubsub.kafka.brokers | quote }}
+  # Consumer group for this component
+  - name: consumerGroup
+    value: {{ .Values.pubsub.consumerGroup | quote }}
+  # Authentication configuration
+  - name: authRequired
+    value: {{ .Values.pubsub.kafka.authRequired | quote }}
+  {{- if .Values.pubsub.kafka.authRequired }}
+  - name: saslUsername
+    value: {{ .Values.pubsub.kafka.saslUsername | quote }}
+  - name: saslPassword
+    secretKeyRef:
+      name: kafka-credentials
+      key: sasl-password
+  - name: saslMechanism
+    value: {{ .Values.pubsub.kafka.saslMechanism | quote }}
+  {{- end }}
+  # Client ID for Kafka connection
+  - name: clientID
+    value: {{ .Values.pubsub.metadata.clientID | quote }}
+  # Consumer fetch default (bytes)
+  - name: consumerFetchDefault
+    value: {{ .Values.pubsub.metadata.consumerFetchDefault | quote }}
+  # Maximum message size
+  - name: maxMessageBytes
+    value: {{ .Values.pubsub.metadata.maxMessageBytes | quote }}
+  # Kafka version
+  - name: version
+    value: {{ .Values.pubsub.metadata.version | quote }}
+  # Enable idempotent producer for exactly-once semantics
+  - name: enableIdempotence
+    value: "true"
+  # Topic configuration - start from newest messages
+  - name: initialOffset
+    value: "newest"
+  {{- if .Values.scopes.pubsub }}
+  # Scopes - which apps can access this component
+scopes:
+  {{- range .Values.scopes.pubsub }}
+  - {{ . }}
+  {{- end }}
+  {{- end }}
+{{- end }}

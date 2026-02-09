@@ -1,0 +1,78 @@
+# T014: Staging environment values
+# Overrides for staging environment (pre-production testing)
+
+global:
+  imageTag: staging
+  imagePullPolicy: IfNotPresent
+
+frontend:
+  replicaCount: 2  # High availability
+  service:
+    type: LoadBalancer
+  resources:
+    requests:
+      cpu: 150m
+      memory: 192Mi
+    limits:
+      cpu: 750m
+      memory: 768Mi
+
+backend:
+  replicaCount: 2  # High availability
+  dapr:
+    logLevel: info
+  resources:
+    requests:
+      cpu: 300m
+      memory: 384Mi
+    limits:
+      cpu: 1500m
+      memory: 1536Mi
+
+kafka:
+  replicaCount: 1
+  persistence:
+    size: 20Gi  # Medium storage for staging
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+
+zookeeper:
+  replicaCount: 1
+  persistence:
+    size: 5Gi
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+
+recurringTaskService:
+  replicaCount: 1
+  dapr:
+    logLevel: info
+  resources:
+    requests:
+      cpu: 150m
+      memory: 192Mi
+    limits:
+      cpu: 750m
+      memory: 768Mi
+
+notificationService:
+  replicaCount: 1
+  dapr:
+    logLevel: info
+  resources:
+    requests:
+      cpu: 75m
+      memory: 96Mi
+    limits:
+      cpu: 300m
+      memory: 384Mi

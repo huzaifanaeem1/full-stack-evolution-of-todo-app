@@ -1,0 +1,137 @@
+# T050: Zookeeper StatefulSet template
+# Phase V - Part C: Production Cloud Deployment
+{{- if .Values.zookeeper.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zookeeper
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: zookeeper
+    app.kubernetes.io/name: zookeeper
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  serviceName: zookeeper-headless
+  replicas: {{ .Values.zookeeper.replicaCount }}
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: zookeeper
+        image: "{{ .Values.zookeeper.image.repository }}:{{ .Values.zookeeper.image.tag }}"
+        imagePullPolicy: {{ .Values.zookeeper.image.pullPolicy }}
+        {{- with .Values.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        ports:
+        - containerPort: {{ .Values.zookeeper.service.targetPort }}
+          name: client
+        - containerPort: {{ .Values.zookeeper.service.peerPort }}
+          name: peer
+        - containerPort: {{ .Values.zookeeper.service.leaderElectionPort }}
+          name: leader-election
+        env:
+        - name: ZOOKEEPER_CLIENT_PORT
+          value: "{{ .Values.zookeeper.service.targetPort }}"
+        - name: ZOOKEEPER_TICK_TIME
+          value: "{{ .Values.zookeeper.config.tickTime }}"
+        - name: ZOOKEEPER_INIT_LIMIT
+          value: "{{ .Values.zookeeper.config.initLimit }}"
+        - name: ZOOKEEPER_SYNC_LIMIT
+          value: "{{ .Values.zookeeper.config.syncLimit }}"
+        - name: ZOOKEEPER_MAX_CLIENT_CNXNS
+          value: "{{ .Values.zookeeper.config.maxClientCnxns }}"
+        - name: ZOOKEEPER_AUTOPURGE_SNAP_RETAIN_COUNT
+          value: "{{ .Values.zookeeper.config.autopurgeSnapRetainCount }}"
+        - name: ZOOKEEPER_AUTOPURGE_PURGE_INTERVAL
+          value: "{{ .Values.zookeeper.config.autopurgePurgeInterval }}"
+        - name: ZOOKEEPER_SERVER_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/zookeeper/data
+        - name: log
+          mountPath: /var/lib/zookeeper/log
+        {{- if .Values.zookeeper.resources }}
+        resources:
+          {{- toYaml .Values.zookeeper.resources | nindent 10 }}
+        {{- end }}
+        {{- if .Values.zookeeper.livenessProbe.enabled }}
+        livenessProbe:
+          tcpSocket:
+            port: client
+          initialDelaySeconds: {{ .Values.zookeeper.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.zookeeper.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.zookeeper.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.zookeeper.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.zookeeper.readinessProbe.enabled }}
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "echo ruok | nc localhost {{ .Values.zookeeper.service.targetPort }} | grep imok"
+          initialDelaySeconds: {{ .Values.zookeeper.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.zookeeper.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.zookeeper.readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.zookeeper.readinessProbe.failureThreshold }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{- if .Values.zookeeper.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+        - {{ .Values.zookeeper.persistence.accessMode }}
+      {{- if .Values.zookeeper.persistence.storageClass }}
+      storageClassName: {{ .Values.zookeeper.persistence.storageClass }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.zookeeper.persistence.size }}
+  - metadata:
+      name: log
+    spec:
+      accessModes:
+        - {{ .Values.zookeeper.persistence.accessMode }}
+      {{- if .Values.zookeeper.persistence.storageClass }}
+      storageClassName: {{ .Values.zookeeper.persistence.storageClass }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.zookeeper.persistence.size }}
+  {{- else }}
+  volumes:
+  - name: data
+    emptyDir: {}
+  - name: log
+    emptyDir: {}
+  {{- end }}
+{{- end }}

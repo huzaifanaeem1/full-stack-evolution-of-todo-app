@@ -1,0 +1,138 @@
+# T071: Notification Service deployment template with Dapr annotations
+# T072: Dapr annotations included
+# T074: Liveness and readiness probes
+# Phase V - Part C: Production Cloud Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: notification-service
+    app.kubernetes.io/name: notification-service
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+      annotations:
+        {{- if .Values.dapr.enabled }}
+        # T072: Dapr sidecar annotations
+        dapr.io/enabled: "true"
+        dapr.io/app-id: {{ .Values.dapr.appId | quote }}
+        dapr.io/app-port: {{ .Values.dapr.appPort | quote }}
+        dapr.io/app-protocol: {{ .Values.dapr.appProtocol | quote }}
+        dapr.io/log-level: {{ .Values.dapr.logLevel | quote }}
+        dapr.io/sidecar-cpu-request: {{ .Values.dapr.sidecarResources.requests.cpu | quote }}
+        dapr.io/sidecar-memory-request: {{ .Values.dapr.sidecarResources.requests.memory | quote }}
+        dapr.io/sidecar-cpu-limit: {{ .Values.dapr.sidecarResources.limits.cpu | quote }}
+        dapr.io/sidecar-memory-limit: {{ .Values.dapr.sidecarResources.limits.memory | quote }}
+        {{- end }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: notification-service
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- with .Values.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        ports:
+        - containerPort: {{ .Values.service.targetPort }}
+          name: http
+          protocol: TCP
+        env:
+        # Dapr Pub/Sub configuration
+        - name: PUBSUB_NAME
+          value: {{ .Values.env.pubsubName | quote }}
+        - name: TASK_EVENTS_TOPIC
+          value: {{ .Values.env.taskEventsTopic | quote }}
+        - name: REMINDERS_TOPIC
+          value: {{ .Values.env.remindersTopic | quote }}
+        # Notification configuration
+        - name: EMAIL_ENABLED
+          value: {{ .Values.env.emailEnabled | quote }}
+        - name: SMS_ENABLED
+          value: {{ .Values.env.smsEnabled | quote }}
+        - name: PUSH_ENABLED
+          value: {{ .Values.env.pushEnabled | quote }}
+        - name: LOG_LEVEL
+          value: {{ .Values.env.logLevel | quote }}
+        - name: PORT
+          value: {{ .Values.service.targetPort | quote }}
+        # SMTP configuration (if email enabled)
+        {{- if eq .Values.env.emailEnabled "true" }}
+        - name: SMTP_HOST
+          value: {{ .Values.env.smtpHost | quote }}
+        - name: SMTP_PORT
+          value: {{ .Values.env.smtpPort | quote }}
+        - name: SMTP_USER
+          value: {{ .Values.env.smtpUser | quote }}
+        - name: SMTP_FROM
+          value: {{ .Values.env.smtpFrom | quote }}
+        - name: SMTP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: SMTP_PASSWORD
+              optional: true
+        {{- end }}
+        {{- if .Values.resources }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        {{- end }}
+        {{- if .Values.livenessProbe.enabled }}
+        # T074: Liveness probe
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.livenessProbe.httpGet.path }}
+            port: {{ .Values.livenessProbe.httpGet.port }}
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.readinessProbe.enabled }}
+        # T074: Readiness probe
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.readinessProbe.httpGet.path }}
+            port: {{ .Values.readinessProbe.httpGet.port }}
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,16 @@
+# T062: Recurring Task Service Helm Chart metadata
+# Phase V - Part C: Production Cloud Deployment
+apiVersion: v2
+name: recurring-task-service
+description: Recurring Task Service for automated task recurrence management
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - recurring-tasks
+  - automation
+  - event-driven
+  - dapr
+maintainers:
+  - name: Todo App Team
+    email: team@example.com

@@ -1,0 +1,14 @@
+# T021: Frontend Chart metadata
+apiVersion: v2
+name: frontend
+description: Todo Application Frontend - Next.js App Router
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - frontend
+  - nextjs
+  - todo
+maintainers:
+  - name: Todo App Team
+    email: team@todo-app.com

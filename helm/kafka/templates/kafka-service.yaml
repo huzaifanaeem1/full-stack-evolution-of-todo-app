@@ -1,0 +1,51 @@
+# T053: Kafka Service template
+# Phase V - Part C: Production Cloud Deployment
+{{- if .Values.kafka.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: kafka
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  type: {{ .Values.kafka.service.type }}
+  ports:
+  - port: {{ .Values.kafka.service.port }}
+    targetPort: {{ .Values.kafka.service.targetPort }}
+    protocol: TCP
+    name: plaintext
+  selector:
+    app: kafka
+---
+# Headless service for StatefulSet
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-headless
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: kafka
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - port: {{ .Values.kafka.service.port }}
+    targetPort: {{ .Values.kafka.service.targetPort }}
+    protocol: TCP
+    name: plaintext
+  - port: 9093
+    targetPort: 9093
+    protocol: TCP
+    name: controller
+  selector:
+    app: kafka
+{{- end }}
